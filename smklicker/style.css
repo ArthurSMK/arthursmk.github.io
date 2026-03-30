@@ -1,0 +1,206 @@
+:root {
+    --bg-color: #121212;
+    --panel-bg: #1e1e1e;
+    --text-color: #ffffff;
+    --text-muted: #aaaaaa;
+    --smk-pink: #fd0041;
+    --smk-pink-hover: #ff3366;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    display: flex;
+    justify-content: center;
+    height: 100vh;
+    overflow: hidden;
+}
+
+.game-container {
+    display: flex;
+    width: 100%;
+    max-width: 1200px;
+    height: 100%;
+}
+
+/* Painel Esquerdo */
+.left-panel {
+    flex: 1;
+    padding: 2rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    border-right: 2px solid #333;
+    background: linear-gradient(180deg, var(--bg-color) 0%, #1a0006 100%);
+}
+
+.header h1 {
+    color: var(--smk-pink);
+    font-size: 3rem;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+}
+
+.score-board {
+    text-align: center;
+    margin: 2rem 0;
+    background-color: var(--panel-bg);
+    padding: 1.5rem 3rem;
+    border-radius: 15px;
+    border: 1px solid #333;
+    box-shadow: 0 0 15px rgba(253, 0, 65, 0.1);
+}
+
+.smkoins-display {
+    font-size: 2.5rem;
+    font-weight: bold;
+    color: var(--smk-pink);
+}
+
+.sps-display {
+    font-size: 1.2rem;
+    color: var(--text-muted);
+}
+
+.click-area {
+    margin: 3rem 0;
+}
+
+#borboleta-btn {
+    font-size: 8rem; /* Tamanho do ícone/botão */
+    background: none;
+    border: none;
+    cursor: pointer;
+    transition: transform 0.1s ease;
+    user-select: none;
+}
+
+#borboleta-btn:active {
+    transform: scale(0.95);
+}
+
+/* Painel Direito (Loja) */
+.right-panel {
+    flex: 1;
+    padding: 2rem;
+    overflow-y: auto;
+    background-color: var(--panel-bg);
+}
+
+.store-section h2 {
+    color: var(--text-muted);
+    border-bottom: 2px solid var(--smk-pink);
+    padding-bottom: 0.5rem;
+    margin-bottom: 1rem;
+    margin-top: 1rem;
+}
+
+/* Estruturas */
+.estrutura-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #2a2a2a;
+    padding: 1rem;
+    margin-bottom: 0.5rem;
+    border-radius: 8px;
+    cursor: pointer;
+    border: 1px solid transparent;
+    transition: all 0.2s;
+}
+
+.estrutura-item:hover {
+    border-color: var(--smk-pink);
+}
+
+.estrutura-item.disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    filter: grayscale(100%);
+}
+
+.est-info h4 {
+    color: #fff;
+    margin-bottom: 0.2rem;
+}
+
+.est-info p {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+}
+
+.est-preco {
+    color: var(--smk-pink);
+    font-weight: bold;
+}
+
+.est-count {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #fff;
+    background-color: rgba(253, 0, 65, 0.2);
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+}
+
+/* Upgrades */
+.upgrades-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 10px;
+}
+
+.upgrade-btn {
+    background-color: #2a2a2a;
+    color: white;
+    border: 1px solid #444;
+    padding: 0.8rem;
+    border-radius: 8px;
+    cursor: pointer;
+    text-align: center;
+    font-size: 0.9rem;
+}
+
+.upgrade-btn.disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.upgrade-btn:not(.disabled):hover {
+    background-color: var(--smk-pink);
+    border-color: var(--smk-pink-hover);
+}
+
+/* Eventos (Golden Cookies) */
+.evento-btn {
+    position: absolute;
+    background-color: gold;
+    color: black;
+    border: none;
+    padding: 15px;
+    border-radius: 50%;
+    font-weight: bold;
+    cursor: pointer;
+    box-shadow: 0 0 20px gold;
+    animation: pulsar 1s infinite alternate;
+    z-index: 1000;
+}
+
+@keyframes pulsar {
+    0% { transform: scale(1); }
+    100% { transform: scale(1.1); }
+}
+
+/* Conquistas */
+#latest-achievement {
+    color: var(--smk-pink);
+    font-style: italic;
+    margin-top: 10px;
+}

@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SMKlicker</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="game-container">
+        <div class="left-panel">
+            <div class="header">
+                <h1>SMKlicker</h1>
+                <p class="subtitle">O Império da Live</p>
+            </div>
+            
+            <div class="score-board">
+                <div class="smkoins-display">
+                    <span id="smkoins">0</span> 
+                    <span class="currency-name">SMKoins</span>
+                </div>
+                <div class="sps-display">
+                    SPS: <span id="sps">0</span> / seg
+                </div>
+            </div>
+
+            <div class="click-area">
+                <button id="borboleta-btn" onclick="clicarBorboleta()">🦋</button>
+            </div>
+
+            <div class="achievements-section">
+                <h3>Última Conquista</h3>
+                <div id="latest-achievement">Nenhuma ainda...</div>
+            </div>
+        </div>
+
+        <div class="right-panel">
+            <div class="store-section">
+                <h2>Upgrades</h2>
+                <div id="upgrades-container" class="upgrades-grid">
+                    </div>
+            </div>
+
+            <div class="store-section">
+                <h2>Estruturas</h2>
+                <div id="estruturas-container" class="estruturas-list">
+                    </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="evento-container"></div>
+
+    <script src="script.js"></script>
+</body>
+</html>
