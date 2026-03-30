@@ -1,4 +1,4 @@
-/* Declaração de Variáveis de Cores (Modo Claro Padrão) */
+/* Declaração de Variáveis de Cores (Modo Claro) */
 :root {
     --bg-color: #fdfdfd;
     --text-color: #111;
@@ -7,10 +7,12 @@
     --card-border: #111;
     --shadow-color: #111;
     
-    /* Cores originais dos cards */
+    /* A cor da sua marca no modo claro (Rosa) */
+    --brand-color: #fd0041; 
+    
     --caca-erro: #9ec0ff;
     --tabuleiro: #b5e6a2;
-    --smklicker: #e095a8;
+    --smklicker: #ff9e9e;
     --em-breve: #e0e0e0;
 }
 
@@ -23,7 +25,9 @@
     --card-border: #fdfdfd;
     --shadow-color: #fdfdfd;
 
-    /* Cores adaptadas para não ofuscar no escuro */
+    /* A cor da sua marca no modo escuro (Branco) */
+    --brand-color: #ffffff;
+
     --caca-erro: #8a3c3c;
     --tabuleiro: #3f6e30;
     --em-breve: #333333;
@@ -45,6 +49,10 @@ body {
     align-items: center;
     min-height: 100vh;
     padding: 50px 20px 0 20px;
+}
+
+#img-css {
+    width: 4%;
 }
 
 /* Botão de Tema */
@@ -177,4 +185,87 @@ footer p {
     color: var(--text-muted);
     font-size: 0.9rem;
     font-weight: 500;
+}
+
+/* =========================================
+   ESTILOS DA LOGO E NOME DA MARCA
+   ========================================= */
+.logo-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 15px; /* Espaço entre a logo e o nome */
+    margin-bottom: 10px;
+}
+
+.brand-name {
+    font-size: 3.5rem;
+    font-weight: 800;
+    letter-spacing: -1px;
+    color: var(--brand-color);
+    transition: color 0.3s ease;
+}
+
+.logo-img {
+    width: 60px; /* Tamanho da logo */
+    height: 60px;
+    /* O background define a cor que a logo vai ter */
+    background-color: var(--brand-color);
+    /* A máscara usa o formato do seu PNG para "cortar" essa cor */
+    -webkit-mask-size: contain;
+    -webkit-mask-repeat: no-repeat;
+    -webkit-mask-position: center;
+    mask-size: contain;
+    mask-repeat: no-repeat;
+    mask-position: center;
+    transition: background-color 0.3s ease;
+}
+
+/* Esconde o h1 antigo do cabeçalho caso tenha sobrado no código */
+header h1:not(.brand-name) {
+    display: none; 
+}
+
+
+/* =========================================
+   ESTILOS DAS TAGS DENTRO DOS CARDS
+   ========================================= */
+.game-card {
+    position: relative; /* Isso é crucial para as tags ficarem no lugar certo */
+    /* ... o resto do estilo do game-card já está lá em cima ... */
+}
+
+/* Estilo base compartilhado pelas tags */
+.tag-novo, .tag-dev {
+    position: absolute;
+    top: -12px; /* Faz a tag pular um pouquinho pra fora do card */
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border: 2px solid var(--card-border);
+    box-shadow: 2px 2px 0px var(--shadow-color);
+    z-index: 10;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+/* Posição e cor específica da tag NOVO */
+.tag-novo {
+    left: -10px;
+    background-color: #ffde59; /* Amarelo chamativo */
+    color: #111; /* Texto sempre escuro para ler bem no amarelo */
+}
+
+/* Posição e cor específica da tag EM DESENVOLVIMENTO */
+.tag-dev {
+    right: -10px;
+    background-color: #38b6ff; /* Azul claro estilo blueprint */
+    color: #111;
+}
+
+/* Ajuste no texto dos cards para não encostar nas tags */
+.game-card h2 {
+    margin-top: 15px; 
 }
