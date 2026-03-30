@@ -1,3 +1,4 @@
+/* MANTENHA O TOPO DO SEU CSS ATÉ .right-panel, SUBSTITUA O RESTO PELO ABAIXO */
 :root {
     --bg-color: #121212;
     --panel-bg: #1e1e1e;
@@ -7,66 +8,96 @@
     --smk-pink-hover: #ff3366;
 }
 
-* {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-}
+* { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
 
-body {
-    background-color: var(--bg-color);
-    color: var(--text-color);
+body { background-color: var(--bg-color); color: var(--text-color); display: flex; justify-content: center; height: 100vh; overflow: hidden; }
+
+.game-container { display: flex; width: 100vw; height: 100vh; }
+
+.left-panel { flex: 1; padding: 2rem; display: flex; flex-direction: column; align-items: center; border-right: 2px solid #333; background: linear-gradient(180deg, var(--bg-color) 0%, #1a0006 100%); }
+
+.header h1 { color: var(--smk-pink); font-size: 3rem; text-transform: uppercase; letter-spacing: 2px; }
+
+.score-board { text-align: center; margin: 1.5rem 0; background-color: var(--panel-bg); padding: 1.5rem 3rem; border-radius: 15px; border: 1px solid #333; box-shadow: 0 0 15px rgba(253, 0, 65, 0.1); }
+.smkoins-display { font-size: 2.5rem; font-weight: bold; color: var(--smk-pink); }
+.sps-display { font-size: 1.2rem; color: var(--text-muted); }
+
+/* Novos Botões de Menu */
+.menu-buttons { display: flex; gap: 10px; margin-bottom: 2rem; }
+.menu-btn { background-color: #2a2a2a; color: white; border: 1px solid var(--smk-pink); padding: 0.8rem 1.5rem; border-radius: 8px; cursor: pointer; font-weight: bold; transition: background-color 0.2s; }
+.menu-btn:hover { background-color: var(--smk-pink); }
+.btn-danger { border-color: red; }
+.btn-danger:hover { background-color: red; }
+
+.click-area { margin: 2rem 0; }
+#img-css { width: 25%;}
+#borboleta-btn { font-size: 8rem; background: none; border: none; cursor: pointer; transition: transform 0.1s ease; user-select: none; }
+#borboleta-btn:active { transform: scale(0.95); }
+
+.right-panel { flex: 1; padding: 2rem; overflow-y: auto; background-color: var(--panel-bg); }
+.store-section h2 { color: var(--text-muted); border-bottom: 2px solid var(--smk-pink); padding-bottom: 0.5rem; margin-bottom: 1rem; margin-top: 1rem; }
+
+/* Estruturas */
+.estrutura-item { display: flex; justify-content: space-between; align-items: center; background-color: #2a2a2a; padding: 1rem; margin-bottom: 0.5rem; border-radius: 8px; cursor: pointer; border: 1px solid transparent; transition: all 0.2s; }
+.estrutura-item:hover { border-color: var(--smk-pink); background-color: #333; }
+.estrutura-item.disabled { opacity: 0.5; cursor: not-allowed; filter: grayscale(100%); }
+.est-info h4 { color: #fff; margin-bottom: 0.2rem; }
+.est-info p { font-size: 0.85rem; color: var(--text-muted); }
+.est-preco { color: var(--smk-pink); font-weight: bold; }
+.est-count { font-size: 1.5rem; font-weight: bold; color: #fff; background-color: rgba(253, 0, 65, 0.2); padding: 0.5rem 1rem; border-radius: 8px; }
+.estrutura-misterio { display: flex; justify-content: center; align-items: center; background-color: #1a1a1a; padding: 1.5rem; margin-bottom: 0.5rem; border-radius: 8px; border: 1px dashed #444; color: #555; font-weight: bold; font-size: 1.5rem; cursor: not-allowed; user-select: none; }
+
+/* Grid de Quadrados (Upgrades e Conquistas) */
+.upgrades-grid { display: flex; flex-wrap: wrap; gap: 8px; }
+
+/* Quadrado 1x1 */
+.square-icon {
+    width: 60px;
+    height: 60px;
+    background-color: #2a2a2a;
+    border: 2px solid #444;
+    border-radius: 8px;
+    cursor: pointer;
     display: flex;
     justify-content: center;
-    height: 100vh;
-    overflow: hidden;
-}
-
-.game-container {
-    display: flex;
-    width: 100vw; /* Ocupa 100% da largura da tela */
-    height: 100vh; /* Ocupa 100% da altura da tela */
-}
-
-/* Painel Esquerdo */
-.left-panel {
-    flex: 1;
-    padding: 2rem;
-    display: flex;
-    flex-direction: column;
     align-items: center;
-    border-right: 2px solid #333;
-    background: linear-gradient(180deg, var(--bg-color) 0%, #1a0006 100%);
+    font-size: 1.8rem;
+    transition: transform 0.2s, border-color 0.2s, box-shadow 0.2s;
+    background-size: cover;
+    background-position: center;
+    position: relative;
 }
+.square-icon:not(.disabled):hover {
+    transform: scale(1.15);
+    border-color: var(--smk-pink);
+    box-shadow: 0 0 10px rgba(253, 0, 65, 0.5);
+    z-index: 10;
+}
+.square-icon.disabled { opacity: 0.4; cursor: not-allowed; filter: grayscale(100%); }
 
-.header h1 {
-    color: var(--smk-pink);
-    font-size: 3rem;
-    text-transform: uppercase;
-    letter-spacing: 2px;
-}
+/* Conquistas (Locked vs Unlocked) */
+.conq-unlocked { border-color: gold; box-shadow: 0 0 5px rgba(255, 215, 0, 0.3); }
+.conq-locked { background-color: #111; color: #444; border-color: #333; cursor: default; }
+.conq-locked:hover { transform: none; box-shadow: none; border-color: #333; }
 
-.score-board {
-    text-align: center;
-    margin: 2rem 0;
-    background-color: var(--panel-bg);
-    padding: 1.5rem 3rem;
-    border-radius: 15px;
-    border: 1px solid #333;
-    box-shadow: 0 0 15px rgba(253, 0, 65, 0.1);
-}
+/* Modais */
+.modal { display: none; position: fixed; z-index: 2000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.8); backdrop-filter: blur(5px); }
+.modal-content { background-color: var(--panel-bg); margin: 5% auto; padding: 2rem; border: 2px solid var(--smk-pink); border-radius: 15px; width: 400px; color: white; position: relative; }
+.modal-large { width: 80%; max-width: 800px; max-height: 80vh; overflow-y: auto; }
+.close-btn { color: #aaa; float: right; font-size: 28px; font-weight: bold; cursor: pointer; position: absolute; top: 10px; right: 20px; }
+.close-btn:hover { color: #fff; }
+.conquistas-section { margin-top: 1.5rem; }
+.conquistas-section h3 { margin-bottom: 10px; color: var(--smk-pink); border-bottom: 1px solid #333; padding-bottom: 5px; }
+.config-buttons { display: flex; flex-direction: column; gap: 15px; margin-top: 20px; }
 
-.smkoins-display {
-    font-size: 2.5rem;
-    font-weight: bold;
-    color: var(--smk-pink);
-}
+/* Tooltip */
+.tooltip { position: absolute; background-color: rgba(18, 18, 18, 0.95); color: #fff; padding: 15px; border: 1px solid var(--smk-pink); border-radius: 8px; pointer-events: none; z-index: 9999; font-size: 0.9rem; box-shadow: 0 4px 15px rgba(0,0,0,0.5); min-width: 250px; }
+.tooltip h4 { color: var(--smk-pink); margin-bottom: 5px; font-size: 1.1rem; }
 
-.sps-display {
-    font-size: 1.2rem;
-    color: var(--text-muted);
-}
+/* Toast Notifications */
+#toast-container { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); z-index: 3000; display: flex; flex-direction: column; gap: 10px; pointer-events: none; }
+.toast { background-color: #1a1a1a; color: white; border-left: 5px solid gold; padding: 15px 25px; border-radius: 5px; box-shadow: 0 5px 15px rgba(0,0,0,0.5); font-weight: bold; opacity: 0; transform: translateY(20px); transition: opacity 0.3s, transform 0.3s; }
+.toast.show { opacity: 1; transform: translateY(0); }
 
 .click-area {
     margin: 3rem 0;
@@ -152,9 +183,10 @@ body {
 
 /* Upgrades */
 .upgrades-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    display: flex;
+    flex-wrap: wrap;
     gap: 10px;
+    justify-content: flex-start;
 }
 
 .upgrade-btn {
@@ -223,4 +255,21 @@ body {
     color: var(--smk-pink);
     font-style: italic;
     margin-top: 10px;
+}
+
+/* Estruturas Escondidas (Mistério) */
+.estrutura-misterio {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #1a1a1a;
+    padding: 1.5rem;
+    margin-bottom: 0.5rem;
+    border-radius: 8px;
+    border: 1px dashed #444;
+    color: #555;
+    font-weight: bold;
+    font-size: 1.5rem;
+    cursor: not-allowed;
+    user-select: none;
 }

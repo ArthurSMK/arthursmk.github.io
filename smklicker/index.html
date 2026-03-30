@@ -24,13 +24,13 @@
                 </div>
             </div>
 
-            <div class="click-area">
-                <button id="borboleta-btn" onclick="clicarBorboleta()">🦋</button>
+            <div class="menu-buttons">
+                <button class="menu-btn" onclick="abrirModal('modal-conquistas')">🏆 Conquistas</button>
+                <button class="menu-btn" onclick="abrirModal('modal-config')">⚙️ Config.</button>
             </div>
 
-            <div class="achievements-section">
-                <h3>Última Conquista</h3>
-                <div id="latest-achievement">Nenhuma ainda...</div>
+            <div class="click-area">
+                <button id="borboleta-btn" onclick="clicarBorboleta()"><img id="img-css" src="logo.png" alt="TEste"></button>
             </div>
         </div>
 
@@ -49,9 +49,43 @@
         </div>
     </div>
 
+    <div id="modal-conquistas" class="modal">
+        <div class="modal-content modal-large">
+            <span class="close-btn" onclick="fecharModal('modal-conquistas')">&times;</span>
+            <h2>🏆 Suas Conquistas</h2>
+            
+            <div class="conquistas-section">
+                <h3>Cliques Manuais</h3>
+                <div id="conq-cliques" class="upgrades-grid"></div>
+            </div>
+            <div class="conquistas-section">
+                <h3>Produção (SPS)</h3>
+                <div id="conq-sps" class="upgrades-grid"></div>
+            </div>
+            <div class="conquistas-section">
+                <h3>Estruturas</h3>
+                <div id="conq-estruturas" class="upgrades-grid"></div>
+            </div>
+        </div>
+    </div>
+
+    <div id="modal-config" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="fecharModal('modal-config')">&times;</span>
+            <h2>⚙️ Configurações</h2>
+            <div class="config-buttons">
+                <button class="menu-btn" onclick="salvarJogoManual()">💾 Salvar Jogo Manualmente</button>
+                <button class="menu-btn btn-danger" onclick="resetarJogo()">🗑️ Novo Jogo (Zerar)</button>
+            </div>
+            <p style="margin-top: 15px; color: var(--text-muted); font-size: 0.9rem; text-align: center;">O jogo salva automaticamente a cada 5 minutos.</p>
+        </div>
+    </div>
+
     <div id="evento-container"></div>
 
     <div id="tooltip" class="tooltip" style="display: none;"></div>
+
+    <div id="toast-container"></div>
 
     <script src="script.js"></script>
 </body>
