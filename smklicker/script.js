@@ -99,17 +99,17 @@ let upgrades = [
     { id: 'espada_nikk', icone: '🔨', nome: 'A Espada Ancestral da Nikk', desc: 'Dobra o SPS dos Moderadores. A lenda da moderação abençoa a equipe com controle absoluto.', custo: 2.5e30, comprado: false, tipo: 'estrutura', alvo: 'mods', reqEstruturaQtd: 450, visivel: false }, // ~2.5 Nonilhões
 
      // Upgrades Fundadores
-    { id: '1mes', nome: '1 Mês de Sub', desc: 'Dobra o SPS dos Fundadores.', custo: 15000, comprado: false, tipo: 'estrutura', alvo: 'fundadores', reqEstruturaQtd: 1, visivel: false }, // ~15 Mil
-    { id: '3meses', nome: '3 Meses de Sub', desc: 'Dobra o SPS dos Fundadores.', custo: 500000, comprado: false, tipo: 'estrutura', alvo: 'fundadores', reqEstruturaQtd: 25, visivel: false }, // ~500 Mil
-    { id: '6meses', nome: '6 Meses de Sub', desc: 'Dobra o SPS dos Fundadores.', custo: 18000000, comprado: false, tipo: 'estrutura', alvo: 'fundadores', reqEstruturaQtd: 50, visivel: false }, // ~18 Milhões
-    { id: '9meses', nome: '9 Meses de Sub', desc: 'Dobra o SPS dos Fundadores.', custo: 20000000000, comprado: false, tipo: 'estrutura', alvo: 'fundadores', reqEstruturaQtd: 100, visivel: false }, // ~20 Bilhões
-    { id: '1ano', nome: '1 Ano de Sub', desc: 'Dobra o SPS dos Fundadores.', custo: 20000000000000, comprado: false, tipo: 'estrutura', alvo: 'fundadores', reqEstruturaQtd: 150, visivel: false }, // ~20 Trilhões
-    { id: '1anoemeio', nome: '1 Ano e Meio de Sub', desc: 'Dobra o SPS dos Fundadores.', custo: 25e15, comprado: false, tipo: 'estrutura', alvo: 'fundadores', reqEstruturaQtd: 200, visivel: false }, // ~25 Quadrilhões
-    { id: '2anos', nome: '2 Anos de Sub', desc: 'Dobra o SPS dos Fundadores.', custo: 25e18, comprado: false, tipo: 'estrutura', alvo: 'fundadores', reqEstruturaQtd: 250, visivel: false }, // ~25 Quintilhões
-    { id: '3anos', nome: '3 Anos de Sub', desc: 'Dobra o SPS dos Fundadores.', custo: 30e21, comprado: false, tipo: 'estrutura', alvo: 'fundadores', reqEstruturaQtd: 300, visivel: false }, // ~30 Sextilhões
-    { id: '4anos', nome: '4 Anos de Sub', desc: 'Dobra o SPS dos Fundadores.', custo: 30e24, comprado: false, tipo: 'estrutura', alvo: 'fundadores', reqEstruturaQtd: 350, visivel: false }, // ~30 Septilhões
-    { id: '5anos', nome: '5 Anos de Sub', desc: 'Dobra o SPS dos Fundadores.', custo: 35e27, comprado: false, tipo: 'estrutura', alvo: 'fundadores', reqEstruturaQtd: 400, visivel: false }, // ~35 Octilhões
-    { id: '6anos', nome: '6 Anos de Sub', desc: 'Dobra o SPS dos Fundadores.', custo: 35e30, comprado: false, tipo: 'estrutura', alvo: 'fundadores', reqEstruturaQtd: 450, visivel: false }, // ~35 Nonilhões
+    { id: '1mes', icone: '👑', nome: '1 Mês de Sub', desc: 'Dobra o SPS dos Fundadores.', custo: 15000, comprado: false, tipo: 'estrutura', alvo: 'fundadores', reqEstruturaQtd: 1, visivel: false }, // ~15 Mil
+    { id: '3meses', icone: '👑', nome: '3 Meses de Sub', desc: 'Dobra o SPS dos Fundadores.', custo: 500000, comprado: false, tipo: 'estrutura', alvo: 'fundadores', reqEstruturaQtd: 25, visivel: false }, // ~500 Mil
+    { id: '6meses', icone: '👑', nome: '6 Meses de Sub', desc: 'Dobra o SPS dos Fundadores.', custo: 18000000, comprado: false, tipo: 'estrutura', alvo: 'fundadores', reqEstruturaQtd: 50, visivel: false }, // ~18 Milhões
+    { id: '9meses', icone: '👑', nome: '9 Meses de Sub', desc: 'Dobra o SPS dos Fundadores.', custo: 20000000000, comprado: false, tipo: 'estrutura', alvo: 'fundadores', reqEstruturaQtd: 100, visivel: false }, // ~20 Bilhões
+    { id: '1ano', icone: '👑', nome: '1 Ano de Sub', desc: 'Dobra o SPS dos Fundadores.', custo: 20000000000000, comprado: false, tipo: 'estrutura', alvo: 'fundadores', reqEstruturaQtd: 150, visivel: false }, // ~20 Trilhões
+    { id: '1anoemeio', icone: '👑', nome: '1 Ano e Meio de Sub', desc: 'Dobra o SPS dos Fundadores.', custo: 25e15, comprado: false, tipo: 'estrutura', alvo: 'fundadores', reqEstruturaQtd: 200, visivel: false }, // ~25 Quadrilhões
+    { id: '2anos', icone: '👑', nome: '2 Anos de Sub', desc: 'Dobra o SPS dos Fundadores.', custo: 25e18, comprado: false, tipo: 'estrutura', alvo: 'fundadores', reqEstruturaQtd: 250, visivel: false }, // ~25 Quintilhões
+    { id: '3anos', icone: '👑', nome: '3 Anos de Sub', desc: 'Dobra o SPS dos Fundadores.', custo: 30e21, comprado: false, tipo: 'estrutura', alvo: 'fundadores', reqEstruturaQtd: 300, visivel: false }, // ~30 Sextilhões
+    { id: '4anos', icone: '👑', nome: '4 Anos de Sub', desc: 'Dobra o SPS dos Fundadores.', custo: 30e24, comprado: false, tipo: 'estrutura', alvo: 'fundadores', reqEstruturaQtd: 350, visivel: false }, // ~30 Septilhões
+    { id: '5anos', icone: '👑', nome: '5 Anos de Sub', desc: 'Dobra o SPS dos Fundadores.', custo: 35e27, comprado: false, tipo: 'estrutura', alvo: 'fundadores', reqEstruturaQtd: 400, visivel: false }, // ~35 Octilhões
+    { id: '6anos', icone: '👑', nome: '6 Anos de Sub', desc: 'Dobra o SPS dos Fundadores.', custo: 35e30, comprado: false, tipo: 'estrutura', alvo: 'fundadores', reqEstruturaQtd: 450, visivel: false }, // ~35 Nonilhões
 
     //Upgrades Lojinho
     { id: 'estoque_renovado', icone: '🛍️', nome: 'Estoque Renovado', desc: 'Dobra o SPS da Lojinho. Itens básicos como figurinhas e badges simples chegam na prateleira.', custo: 120000, comprado: false, tipo: 'estrutura', alvo: 'lojinho', reqEstruturaQtd: 1, visivel: false }, // 120 Mil
