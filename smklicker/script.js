@@ -6,6 +6,7 @@ let estruturasCompradasTotais = 0;
 
 let multiplicadorClique = 1;
 let multiplicadorSPSGlobal = 1;
+let multiplicadorCompra = 1; // <--- Adicione esta linha
 
 // ================= Formatador de Números =================
 function formatarNumero(num) {
@@ -298,6 +299,39 @@ function mostrarNotificacao(texto) {
 }
 
 // ================= Funções Principais =================
+// ================= Sistema de Multiplicador de Compra =================
+function mudarMultiplicador(valor) {
+    multiplicadorCompra = valor;
+    document.querySelectorAll('.buy-btn').forEach(btn => btn.classList.remove('active'));
+    document.getElementById(`btn-buy-${valor}`).classList.add('active');
+    atualizarTela(); 
+}
+
+function getCustoAcumulado(est, qtdDesejada) {
+    let custoTotal = 0;
+    let qtdAtual = est.qtd;
+    for (let i = 0; i < qtdDesejada; i++) {
+        custoTotal += Math.floor(est.custoBase * Math.pow(1.15, qtdAtual + i));
+    }
+    return custoTotal;
+}
+
+function getMaxCompra(est, maxDesejado) {
+    let custoTotal = 0;
+    let qtdAtual = est.qtd;
+    let comprados = 0;
+    for (let i = 0; i < maxDesejado; i++) {
+        let custoProximo = Math.floor(est.custoBase * Math.pow(1.15, qtdAtual + i));
+        if (smkoins >= custoTotal + custoProximo) {
+            custoTotal += custoProximo;
+            comprados++;
+        } else {
+            break;
+        }
+    }
+    return comprados;
+}
+
 function clicarBorboleta() {
     smkoins += (1 * multiplicadorClique);
     cliquesTotais++;
@@ -306,25 +340,25 @@ function clicarBorboleta() {
     checarConquistas();
 }
 
-function calcularCusto(estrutura) {
-    return Math.floor(estrutura.custoBase * Math.pow(1.15, estrutura.qtd));
-}
-
 function comprarEstrutura(index) {
     const est = estruturas[index];
-    const custo = calcularCusto(est);
+    let qtdParaComprar = getMaxCompra(est, multiplicadorCompra);
+    
+    // Se o jogador não tiver dinheiro pra comprar nem 1 unidade, ignora o clique
+    if (qtdParaComprar === 0) return; 
 
-    if (smkoins >= custo) {
-        smkoins -= custo;
-        est.qtd++;
-        estruturasCompradasTotais++;
-        calcularSPS();
-        verificarDesbloqueios(); 
-        renderizarEstruturas(); 
-        atualizarTela();
-        checarConquistas();
-        showStructureTooltip(index);
-    }
+    const custoTotal = getCustoAcumulado(est, qtdParaComprar);
+
+    smkoins -= custoTotal;
+    est.qtd += qtdParaComprar;
+    estruturasCompradasTotais += qtdParaComprar;
+    
+    calcularSPS();
+    verificarDesbloqueios(); 
+    renderizarEstruturas(); 
+    atualizarTela();
+    checarConquistas();
+    showStructureTooltip(index);
 }
 
 function comprarUpgrade(index) {
@@ -442,14 +476,44 @@ function atualizarTela() {
     document.getElementById('smkoins').innerText = formatarNumero(smkoins);
     document.getElementById('sps').innerText = formatarNumero(sps);
 
+    // --- SUBSTITUA DESTE PONTO ---
     estruturas.forEach((est, i) => {
         const div = document.getElementById(`est-${i}`);
         if (div) { 
-            if (smkoins >= calcularCusto(est)) div.classList.remove('disabled');
-            else div.classList.add('disabled');
+            let qtdPossivel = getMaxCompra(est, multiplicadorCompra);
+            let podeComprar = qtdPossivel > 0;
+
+            if (podeComprar) {
+                div.classList.remove('disabled');
+            } else {
+                div.classList.add('disabled');
+            }
+
+            const spanHover = div.querySelector('.est-qtd-hover');
+            const countVal = div.querySelector('.est-count-val');
+            const pPreco = div.querySelector('.est-preco');
+
+            // Atualiza a quantidade atual sempre
+            if (countVal) countVal.innerText = est.qtd;
+
+            if (spanHover && pPreco) {
+                if (podeComprar) {
+                    // Mostra quanto vai comprar e deixa branco pra destacar
+                    spanHover.innerText = `(+${qtdPossivel})`;
+                    spanHover.style.color = '#fff'; 
+                    pPreco.innerText = `💰 ${formatarNumero(getCustoAcumulado(est, qtdPossivel))} SMK`;
+                } else {
+                    // Se não tiver dinheiro, mostra +1 na cor cinza e o valor do próximo
+                    spanHover.innerText = `(+1)`;
+                    spanHover.style.color = 'var(--text-muted)';
+                    pPreco.innerText = `💰 ${formatarNumero(getCustoAcumulado(est, 1))} SMK`;
+                }
+            }
         }
     });
+    // --- ATÉ ESTE PONTO ---
 
+    // O código do upgrades.forEach() continua aqui embaixo normalmente...
     upgrades.forEach((upg, i) => {
         const btn = document.getElementById(`upg-${i}`);
         if (btn && !upg.comprado) {
@@ -467,14 +531,23 @@ function renderizarEstruturas() {
         if (revelado) {
             const html = `
                 <div id="est-${i}" class="estrutura-item disabled" onclick="comprarEstrutura(${i})" onmouseenter="showStructureTooltip(${i})" onmouseleave="hideTooltip()">
-                    <div class="est-info"><h4>${est.nome}</h4><p class="est-preco">💰 ${formatarNumero(calcularCusto(est))} SMK</p></div>
-                    <div class="est-count">${est.qtd}</div>
+                    <div class="est-info">
+                        <h4 class="est-nome">${est.nome}</h4>
+                        <p class="est-preco"></p>
+                    </div>
+                    <div class="est-count">
+                        <span class="est-count-val">${est.qtd}</span>
+                        <span class="est-qtd-hover"></span>
+                    </div>
                 </div>`;
             container.innerHTML += html;
         } else {
             container.innerHTML += `<div class="estrutura-misterio">???</div>`;
         }
     });
+    
+    // Injeta os valores corretos após criar o HTML
+    atualizarTela();
 }
 
 // Renderiza Upgrades em formato de Quadradinhos
