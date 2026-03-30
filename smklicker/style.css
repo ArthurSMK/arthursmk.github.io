@@ -25,9 +25,8 @@ body {
 
 .game-container {
     display: flex;
-    width: 100%;
-    max-width: 1200px;
-    height: 100%;
+    width: 100vw; /* Ocupa 100% da largura da tela */
+    height: 100vh; /* Ocupa 100% da altura da tela */
 }
 
 /* Painel Esquerdo */
@@ -74,7 +73,7 @@ body {
 }
 
 #borboleta-btn {
-    font-size: 8rem; /* Tamanho do ícone/botão */
+    font-size: 8rem;
     background: none;
     border: none;
     cursor: pointer;
@@ -118,6 +117,7 @@ body {
 
 .estrutura-item:hover {
     border-color: var(--smk-pink);
+    background-color: #333;
 }
 
 .estrutura-item.disabled {
@@ -178,6 +178,27 @@ body {
     border-color: var(--smk-pink-hover);
 }
 
+/* Tooltip Flutuante */
+.tooltip {
+    position: absolute;
+    background-color: rgba(18, 18, 18, 0.95);
+    color: #fff;
+    padding: 15px;
+    border: 1px solid var(--smk-pink);
+    border-radius: 8px;
+    pointer-events: none; /* Impede que o mouse trave no tooltip */
+    z-index: 9999;
+    font-size: 0.9rem;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+    min-width: 200px;
+}
+
+.tooltip h4 {
+    color: var(--smk-pink);
+    margin-bottom: 5px;
+    font-size: 1.1rem;
+}
+
 /* Eventos (Golden Cookies) */
 .evento-btn {
     position: absolute;
@@ -198,7 +219,6 @@ body {
     100% { transform: scale(1.1); }
 }
 
-/* Conquistas */
 #latest-achievement {
     color: var(--smk-pink);
     font-style: italic;

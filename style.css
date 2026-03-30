@@ -10,6 +10,7 @@
     /* Cores originais dos cards */
     --caca-erro: #ff9e9e;
     --tabuleiro: #b5e6a2;
+    --smklicker: #e6dca2;
     --em-breve: #e0e0e0;
 }
 
@@ -133,6 +134,7 @@ header p {
 /* Aplicando as variáveis de cor nos cards */
 .caca-erro-bg { background-color: var(--caca-erro); }
 .tabuleiro-bg { background-color: var(--tabuleiro); }
+.smklicker-bg { background-color: var(--smklicker); }
 .futsal-bg { background-color: var(--em-breve); border-style: dashed; }
 
 .em-breve { cursor: default; opacity: 0.7; }
