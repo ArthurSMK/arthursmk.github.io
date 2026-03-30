@@ -1,0 +1,56 @@
+# Histórico de Versões - Jogo da Resposta Errada (Overlay Twitch)
+Desenvolvedor Base: Arthur / Assistência IA: Gemini
+===================================================================
+
+## [v1.0.0] - Primeira Conexão
+- Estrutura base da ponte entre o HTML e a Twitch estabelecida.
+- Implementada biblioteca `tmi.js` e substituída pela `ComfyJS` para maior fluidez e detecção nativa de comandos (!A, !B).
+
+## [v1.1.0] - A Lógica do Jogo
+- Criado o motor base de leitura de votos em tempo real.
+- Bloqueio de SPAM: O sistema reconhece cada nome de usuário e permite apenas 1 voto válido por rodada.
+- Adicionado sistema de avanço manual controlado pela Barra de Espaço.
+
+## [v1.2.0] - Interface e Single Page Application (SPA)
+- Estruturação do aplicativo em Menus sem reload (SPA).
+- Adicionadas telas de Configuração e Opções.
+- Adicionado painel inferior de Redes Sociais com ícones da FontAwesome.
+- Criado sistema de troca de temas visuais (Dark Mode / Light Mode).
+- Integração da paleta de cores personalizada (#fd0041).
+
+## [v1.3.0] - Áudio e Modo Competitivo
+- Implementação de Efeitos Sonoros com volume padronizado:
+  - `musica-fundo.mp3` (Toca no menu e pausa durante a partida).
+  - `tick.mp3` (Som de tensão de tempo).
+  - `vitoria.mp3` e `derrota.mp3` para resultados.
+- Criação do Modo de Jogo: "Todos Contra Todos (FFA)".
+- Adição do Placar Final (Podium) exibindo os três melhores jogadores e quantidade de acertos.
+
+## [v1.4.0] - Banco de Dados Modular e Perguntas Bônus
+- Código refatorado: Perguntas removidas do HTML e isoladas no arquivo independente `perguntas.js`.
+- Criado sistema inteligente de Perguntas Bônus personalizadas sobre o canal (Valem 2 pontos no FFA).
+- Implementado sistema de "Embaralhamento" (Shuffle) nas perguntas para que a partida não se repita visualmente na mesma ordem.
+
+## [v1.5.0] - O Grande Upgrade Visual (Game Show)
+- Substituição do texto puro por "Cards" arredondados e elegantes.
+- Timer numérico transformado em uma Barra de Progresso visual que encolhe durante os 30 segundos.
+- Animação de Revelação: A alternativa correta infla, ganha bordas e luzes verde-neon (sucesso), enquanto as falsas escurecem.
+- Adição da Caixa de Justificativa: A página agora lê a chave "justificativa" no banco de perguntas e exibe uma explicação didática animada ao fim do tempo.
+- Correção de bug (`TypeError: null`) no reset da caixa de votos da letra D.
+
+## [v1.6.0] - O Chat Totalmente Interativo (Atual)
+- Bugfix Crítico de Áudio: O som do relógio (`tick.mp3`) que "engasgava" durante os últimos segundos foi reescrito. Agora, o disparo do som ocorre de forma limpa e singular, acionado exclusivamente quando o relógio atinge exatamente 5 segundos restantes.
+- Libertação do Overlay: O Container de interações do chat foi movido para a raiz (Body) do DOM, recebendo o atributo `position: fixed`. Isso garante que o engajamento do público permaneça sempre visível sobre qualquer painel (Menu, Jogo ou Opções), ideal para a gravação da tela.
+- Nova Funcionalidade "Balões Animados": Adição do evento `ComfyJS.onChat` (além do `onCommand`), que capta e transforma 100% de todas as mensagens reais do chat em pop-ups de interface.
+- Avatar Twitch API: As mensagens são agora acompanhadas da foto de perfil autêntica do espectador, obtidas via integração silenciosa à API pública `DecAPI`.
+- Animações CSS3 Core: Aplicação de Keyframes (`popIn` e `fadeOut`) nos balões do chat para simular transições de "surgimento elástico" e "desaparecimento fantasma" com ciclo de vida de exatos 4 segundos.
+- Filtro de SPAM Visual (`word-break`): Adicionado mecanismo CSS que bloqueia linhas de texto ininterruptas (como excesso de emojis ou letras repetidas), evitando que o balão extrapole as margens da tela de transmissão.
+- Podium Imersivo (Endgame): A lógica que exibe o ranking dos três melhores jogadores no final das rodadas "FFA" foi atualizada para renderizar fotos de perfil da Twitch lado a lado com as medalhas.
+- Correção de Segurança: Implementação da tag de ancoragem global `target="_blank" rel="noopener noreferrer"` em todo o bloco de redirecionamento de Redes Sociais (Twitch, YouTube, TikTok).
+
+## [v1.7.0] - Organização, Estilização e Modo 1x1 (Atual)
+- Separação Definitiva de Código (Clean Code): Arquivos divididos oficialmente em `index.html`, `style.css`, `script.js` e `perguntas.js`.
+- Estilização Avançada de UI: Inputs de Seleção (Dropdown) customizados com CSS Appearance, eliminando interfaces padrão nativas do SO.
+- **NOVO MODO - Duelo 1x1:** O sistema agora cria uma urna invisível na fase de menus com todos os inscritos que interagirem no chat. Ao selecionar o Duelo, o sistema randomiza 2 jogadores para embate direto, anulando os votos de não-participantes e gerando um pódio de duelo versus (⚔️) no fim.
+- Ajuste Geral Temporal: O Timer base de rodadas foi oficialmente escalado de 30 para 60 segundos por padrão para aumentar a interação narrativa.
+===================================================================

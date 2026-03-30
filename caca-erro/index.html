@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <title>Caça-Erro</title>
+    
+    <link rel="icon" type="image/png" href="Icon.png">
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Anta&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="style.css">
+    
+    <script src="https://cdn.jsdelivr.net/npm/comfy.js/dist/comfy.min.js"></script>
+</head>
+<body>
+
+    <div id="chat-bubbles-container" class="chat-bubbles-container"></div>
+
+    <div id="tela-menu" class="tela ativa">
+        
+        <img src="Icon.png" alt="Logo Caça-Erro" class="logo-principal">
+        
+        <h1>Caça-Erro</h1>
+        
+        <button onclick="mudarTela('tela-config')">🎮 Jogar</button>
+        <button onclick="mudarTela('tela-opcoes')">⚙️ Opções</button>
+        <div class="redes-sociais">
+            <a href="https://www.twitch.tv/arthursmk" target="_blank" rel="noopener noreferrer" class="icon-box"><i class="fa-brands fa-twitch"></i></a>
+            <a href="https://www.youtube.com/@arthursmk18" target="_blank" rel="noopener noreferrer" class="icon-box"><i class="fa-brands fa-youtube"></i></a>
+            <a href="https://www.tiktok.com/@arthursmk" target="_blank" rel="noopener noreferrer" class="icon-box"><i class="fa-brands fa-tiktok"></i></a>
+        </div>
+    </div>
+
+    <div id="tela-config" class="tela">
+        <h2>Configurar Partida</h2>
+        
+        <label for="modo-jogo">Modo de Jogo:</label>
+        <select id="modo-jogo">
+            <option value="ffa">Todos Contra Todos (Ranking Individual)</option>
+            <option value="1v1">Duelo 1x1 (Sorteio Aleatório)</option>
+            <option value="coop">Todos Unidos (O Chat vs O Jogo)</option>
+        </select>
+
+        <label for="qtd-rodadas">Quantidade de Perguntas Normais:</label>
+        <input type="number" id="qtd-rodadas" value="4" min="1" max="50" oninput="atualizarContagem()">
+        
+        <div class="caixa-bonus">
+            <label for="intervalo-bonus" style="color: #ffcc00; margin-bottom: 10px;">🌟 Frequência das Rodadas Bônus:</label>
+            <select id="intervalo-bonus" onchange="atualizarContagem()" style="margin-bottom: 0;">
+                <option value="0">Desativado (Sem Bônus)</option>
+                <option value="1">A cada 1 pergunta normal (1 por 1)</option>
+                <option value="2">A cada 2 perguntas normais</option>
+                <option value="3">A cada 3 perguntas normais</option>
+                <option value="4">A cada 4 perguntas normais</option>
+            </select>
+        </div>
+
+        <div id="aviso-total">Calculando...</div>
+
+        <button onclick="iniciarJogo()">🚀 Iniciar Partida</button>
+        <button class="btn-voltar" onclick="mudarTela('tela-menu')">⬅️ Voltar ao Menu</button>
+    </div>
+
+    <div id="tela-opcoes" class="tela">
+        <h2>Opções do Sistema</h2>
+        <div class="opcao-toggle">
+            <span>🎵 Música de Fundo (Menu)</span>
+            <input type="checkbox" id="check-musica" checked style="width: 25px; height: 25px;" onchange="gerenciarMusicaCheckbox()">
+        </div>
+        <div class="opcao-toggle">
+            <span>🔊 Efeitos Sonoros (Jogo)</span>
+            <input type="checkbox" id="check-sfx" checked style="width: 25px; height: 25px;">
+        </div>
+        <button class="btn-teste" onclick="testarAudios()">🔊 Testar Efeitos Sonoros</button>
+        <label for="tema-site" style="margin-top: 20px;">Tema Visual:</label>
+        <select id="tema-site" onchange="mudarTema()">
+            <option value="dark">🌙 Dark Mode (Preto)</option>
+            <option value="light">☀️ Light Mode (Branco)</option>
+        </select>
+        <button class="btn-voltar" onclick="mudarTela('tela-menu')" style="margin-top: 20px;">⬅️ Voltar ao Menu</button>
+    </div>
+
+    <div id="tela-jogo" class="tela">
+        <div class="pergunta-box" id="caixa-pergunta" style="display: none;">
+            <p class="pergunta-texto" id="texto-pergunta">Carregando...</p>
+        </div>
+        
+        <div class="alternativas-container">
+            <div class="alternativa-card" id="linha-a" style="display: none;">
+                <span class="alt-letra">!A</span>
+                <span class="alt-texto" id="texto-a"></span>
+                <div class="votos-badge"><span id="votos-a">0</span> <i class="fa-solid fa-users"></i></div>
+            </div>
+            <div class="alternativa-card" id="linha-b" style="display: none;">
+                <span class="alt-letra">!B</span>
+                <span class="alt-texto" id="texto-b"></span>
+                <div class="votos-badge"><span id="votos-b">0</span> <i class="fa-solid fa-users"></i></div>
+            </div>
+            <div class="alternativa-card" id="linha-c" style="display: none;">
+                <span class="alt-letra">!C</span>
+                <span class="alt-texto" id="texto-c"></span>
+                <div class="votos-badge"><span id="votos-c">0</span> <i class="fa-solid fa-users"></i></div>
+            </div>
+            <div class="alternativa-card" id="linha-d" style="display: none;">
+                <span class="alt-letra">!D</span>
+                <span class="alt-texto" id="texto-d"></span>
+                <div class="votos-badge"><span id="votos-d">0</span> <i class="fa-solid fa-users"></i></div>
+            </div>
+        </div>
+
+        <div id="justificativa-box" class="justificativa-card" style="display: none;">
+            <div class="justi-header">
+                <i class="fa-solid fa-circle-info"></i> POR QUE ESSA É A FALSA?
+            </div>
+            <p id="justificativa-texto"></p>
+        </div>
+
+        <div class="tempo-container" id="container-tempo" style="display: none;">
+            <div id="timer-text">Tempo: 60s</div>
+            <div class="barra-tempo-fundo">
+                <div id="barra-tempo-fill"></div>
+            </div>
+        </div>
+
+        <div id="resultado" class="caixa-resultado"></div>
+        <button id="btn-encerrar" class="btn-voltar" onclick="voltarMenuJogo()" style="margin-top:20px; display:none;">Voltar ao Menu Principal</button>
+        <div id="dica-teclado">Pressione [ESPAÇO] para iniciar!</div>
+    </div>
+
+    <div id="modal-alerta" class="modal-overlay">
+        <div class="modal-box">
+            <i class="fa-solid fa-triangle-exclamation modal-icon"></i>
+            <p id="modal-mensagem"></p>
+            <button onclick="fecharModal()">Entendi</button>
+        </div>
+    </div>
+
+    <script src="perguntas.js"></script>
+    <script src="script.js"></script>
+    
+</body>
+</html>

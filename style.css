@@ -1,0 +1,178 @@
+/* Declaração de Variáveis de Cores (Modo Claro Padrão) */
+:root {
+    --bg-color: #fdfdfd;
+    --text-color: #111;
+    --text-muted: #555;
+    --card-bg: #fff;
+    --card-border: #111;
+    --shadow-color: #111;
+    
+    /* Cores originais dos cards */
+    --caca-erro: #ff9e9e;
+    --tabuleiro: #b5e6a2;
+    --em-breve: #e0e0e0;
+}
+
+/* Variáveis para o Modo Escuro */
+[data-theme="dark"] {
+    --bg-color: #121212;
+    --text-color: #fdfdfd;
+    --text-muted: #aaa;
+    --card-bg: #1e1e1e;
+    --card-border: #fdfdfd;
+    --shadow-color: #fdfdfd;
+
+    /* Cores adaptadas para não ofuscar no escuro */
+    --caca-erro: #8a3c3c;
+    --tabuleiro: #3f6e30;
+    --em-breve: #333333;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    transition: background-color 0.3s ease, color 0.3s ease; /* Transição suave */
+}
+
+body {
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: 100vh;
+    padding: 50px 20px 0 20px;
+}
+
+/* Botão de Tema */
+.theme-btn {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    background: none;
+    border: 2px solid var(--card-border);
+    font-size: 1.5rem;
+    cursor: pointer;
+    border-radius: 50%;
+    width: 45px;
+    height: 45px;
+    color: var(--text-color);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.theme-btn:hover {
+    background-color: var(--card-border);
+    color: var(--bg-color);
+}
+
+header {
+    text-align: center;
+    margin-top: 30px;
+    margin-bottom: 60px;
+}
+
+header h1 {
+    font-size: 3.5rem;
+    font-weight: 800;
+    letter-spacing: -1px;
+    margin-bottom: 10px;
+}
+
+header p {
+    color: var(--text-muted);
+    font-size: 1.2rem;
+}
+
+.games-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 30px;
+    width: 100%;
+    max-width: 1100px;
+    flex-grow: 1; /* Empurra o rodapé pro fundo */
+}
+
+.game-link {
+    text-decoration: none;
+    color: var(--text-color);
+    display: block;
+}
+
+.game-card {
+    border: 3px solid var(--card-border);
+    border-radius: 12px;
+    height: 180px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    padding: 20px;
+    transition: transform 0.15s ease-out, box-shadow 0.15s ease-out;
+    background-color: var(--card-bg);
+    box-shadow: 4px 4px 0px var(--shadow-color); 
+}
+
+.game-card:hover {
+    transform: translate(-4px, -4px);
+    box-shadow: 8px 8px 0px var(--shadow-color);
+}
+
+.game-card:active {
+    transform: translate(0px, 0px);
+    box-shadow: 0px 0px 0px var(--shadow-color);
+}
+
+.game-card h2 { font-size: 2rem; font-weight: 700; margin-bottom: 8px; }
+.game-card p { font-size: 1.1rem; font-weight: 500; opacity: 0.85; }
+
+/* Aplicando as variáveis de cor nos cards */
+.caca-erro-bg { background-color: var(--caca-erro); }
+.tabuleiro-bg { background-color: var(--tabuleiro); }
+.futsal-bg { background-color: var(--em-breve); border-style: dashed; }
+
+.em-breve { cursor: default; opacity: 0.7; }
+.em-breve .game-card:hover { transform: none; box-shadow: 4px 4px 0px var(--shadow-color); }
+
+/* Estilos do Rodapé (Footer) e Redes Sociais */
+footer {
+    width: 100%;
+    text-align: center;
+    padding: 40px 20px 20px 20px;
+    margin-top: 60px;
+    border-top: 2px dashed var(--card-border);
+}
+
+.social-links {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin-bottom: 20px;
+    flex-wrap: wrap; /* Quebra linha no celular se precisar */
+}
+
+.social-links a {
+    text-decoration: none;
+    color: var(--text-color);
+    font-weight: 700;
+    border: 2px solid var(--card-border);
+    padding: 8px 20px;
+    border-radius: 30px;
+    transition: all 0.2s ease;
+}
+
+.social-links a:hover {
+    background-color: var(--text-color);
+    color: var(--bg-color);
+    transform: translateY(-3px);
+}
+
+footer p {
+    color: var(--text-muted);
+    font-size: 0.9rem;
+    font-weight: 500;
+}

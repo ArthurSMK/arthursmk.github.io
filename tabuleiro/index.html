@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>O Tabuleiro - Edição Profissional</title>
+    
+    <link rel="icon" href="Icon.png" type="image/png">
+    <link rel="stylesheet" href="style.css">
+    
+    <script type="text/javascript" src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js"></script>
+</head>
+<body>
+
+    <div id="tela-menu" class="tela ativa">
+        <img src="Logo.png" alt="Logo O Tabuleiro" class="logo-jogo">
+        <div class="caixa-menu">
+            <button id="btn-continuar-jogo" class="btn-padrao" style="display: none; background-color: var(--success); color: #111; margin-bottom: 15px; font-size: 1.2em;" onclick="carregarJogo()">💾 Continuar Jogo Salvo</button>
+            <button class="btn-padrao" onclick="mudarTela('tela-config')">Novo Jogo</button>
+            <button class="btn-padrao" onclick="mostrarAlerta('Configurações em breve!')">Configurações</button>
+        </div>
+    </div>
+
+    <div id="tela-config" class="tela">
+        <h1 class="titulo-jogo">Configurar Partida</h1>
+        <div class="caixa-menu">
+            <label style="display:block; text-align:left; font-weight:bold; margin-bottom:5px;">Seu Canal da Twitch:</label>
+            <input type="text" id="config-twitch-canal" placeholder="Ex: seu_nome_na_twitch">
+
+            <label style="display:block; text-align:left; font-weight:bold; margin-bottom:5px; margin-top: 15px;">Máximo de Jogadores:</label>
+            <input type="number" id="config-max-jogadores" value="4" min="2" max="10">
+            
+            <button class="btn-padrao" style="margin-top: 20px;" onclick="iniciarLobby()">Criar Sala</button>
+            <button class="btn-padrao" style="background-color: #555;" onclick="mudarTela('tela-menu')">Voltar</button>
+        </div>
+    </div>
+
+    <div id="tela-lobby" class="tela">
+        <h1 class="titulo-jogo">Sala de Espera</h1>
+        <h2 id="status-twitch" style="color: var(--success);">Aguardando jogadores... Digitem !join</h2>
+        <div class="caixa-menu">
+            <h3 id="contador-jogadores">Jogadores: 0 / 4</h3>
+            <ul id="lista-lobby"></ul>
+            
+            <button class="btn-padrao" style="background-color: var(--turn-color); color: #111; margin-top: 10px; font-size: 1.1em;" onclick="adicionarStreamer()">👑 Entrar como Streamer (Arthur)</button>
+
+            <div style="border-top: 1px solid #555; padding-top: 15px; margin-top: 15px; text-align: left;">
+                <label style="font-size: 0.9em; color: #aaa;">*Simular Entrada Manual (!join):</label>
+                <div style="display: flex; gap: 10px; margin-top: 5px;">
+                    <input type="text" id="simulador-nick" placeholder="Nick do viewer" style="margin: 0;">
+                    <button class="btn-padrao" style="margin: 0; width: auto; padding: 0 20px;" onclick="simularJoin()">Add</button>
+                </div>
+            </div>
+            <button id="btn-comecar-jogo" class="btn-padrao" onclick="sortearOrdem()" disabled style="margin-top: 25px; font-size: 1.2em; padding: 15px;">Começar Jogo</button>
+        </div>
+    </div>
+
+    <div id="tela-sorteio" class="tela">
+        <h1 id="titulo-sorteio" class="titulo-jogo">Sorteando a Ordem...</h1>
+        <div class="caixa-menu" style="text-align: center;">
+            <div id="roleta-nomes" style="font-size: 3em; color: var(--accent); margin: 30px 0; font-weight: bold; height: 60px;">???</div>
+            <ul id="ordem-final-lista"></ul>
+        </div>
+    </div>
+
+    <div id="container-jogo">
+        <div id="banner-turno">RODADA 1 | Aguardando Início...</div>
+
+        <div id="tela-jogo-grade">
+            <div class="painel-lateral painel-mestre">
+                <h3 class="titulo-painel">MESTRE</h3>
+                
+                <div style="display: flex; gap: 5px; margin-bottom: 15px; flex-wrap: wrap;">
+                    <button class="btn-ferramenta" onclick="abrirModal('modal-criar')">➕ Criar</button>
+                    <button class="btn-ferramenta" onclick="abrirModal('modal-sorteio')">🎲 Sorteador</button>
+                    <button class="btn-ferramenta" onclick="abrirModal('modal-editar')" style="background-color: #89b4fa; color:#111;">✏️ Editar</button>
+                    <button class="btn-ferramenta" onclick="abrirModalChat()" style="background-color: var(--turn-color); color:#111; position: relative;">
+                        💬 Chat
+                        <span id="notificacao-chat" style="display: none; position: absolute; top: -8px; right: -8px; background: var(--accent); color: white; border-radius: 50%; padding: 3px 7px; font-size: 0.8em; font-weight: bold; border: 2px solid var(--bg-panel);">0</span>
+                    </button>
+                </div>
+                
+                <div class="caixa-interna" style="border: 2px solid var(--turn-color); margin-bottom: 15px;">
+                    <h4 class="subtitulo">Ação (Turno Atual)</h4>
+                    <div id="info-turno-master" style="color: var(--turn-color); font-weight: bold; margin-bottom: 10px; font-size: 1.1em;">Vez de: ???</div>
+                    <div id="aviso-loja" style="display: none; margin-bottom: 10px;">🛒 Vitrine:</div>
+                    <div id="opcoes-movimento" style="margin-bottom: 10px; display: flex; flex-direction: column; gap: 5px; max-height: 150px; overflow-y: auto;"></div>
+                    <button class="btn-padrao" style="background-color: var(--accent);" onclick="passarTurno()">Concluir Turno</button>
+                </div>
+                
+                <h4 class="subtitulo">Painel de Jogadores</h4>
+                <div id="controles-master-jogadores" style="overflow-y: auto; flex: 1; padding-right: 5px;"></div>
+            </div>
+
+            <div class="painel-lateral" style="background-color: transparent; padding: 0;">
+                <h3 class="titulo-painel" style="text-shadow: 2px 2px 4px #000; color: white; border: none; margin-bottom: 0;">O Mapa</h3>
+                <div id="tabuleiro-visual"></div>
+            </div>
+
+            <div class="painel-lateral painel-live">
+                <h3 class="titulo-painel">LIVE</h3>
+                <h4 class="subtitulo">Status dos Jogadores</h4>
+                <div id="jogadores-lista-live" style="flex:1; overflow-y: auto;"></div>
+                
+                <h4 class="subtitulo" style="margin-top: 15px;">Loja (Itens)</h4>
+                <div id="itens-lista" class="lista-cards" style="max-height: 150px; overflow-y: auto;"></div>
+                
+                <h4 class="subtitulo" style="margin-top: 15px;">Regras Ativas</h4>
+                <div id="regras-lista" class="lista-cards" style="max-height: 150px; overflow-y: auto;"></div>
+            </div>
+        </div>
+    </div>
+
+    <div id="modal-vitoria" class="modal-overlay" style="z-index: 3000; backdrop-filter: blur(10px);">
+        <div class="modal-content" style="max-width: 650px; text-align: center; border: 4px solid var(--turn-color); background: rgba(30, 30, 46, 0.95); padding: 50px;">
+            <h1 style="color: var(--turn-color); font-size: 4em; margin-top: 0; margin-bottom: 10px; text-shadow: 0 0 20px rgba(249, 226, 175, 0.5);">👑 VITÓRIA! 👑</h1>
+            <p style="font-size: 1.5em; color: #ccc; margin: 0;">O único sobrevivente do tabuleiro é...</p>
+            <h2 id="vencedor-nome" style="color: white; font-size: 4em; margin: 20px 0; text-transform: uppercase; letter-spacing: 2px;">NOME</h2>
+            <p style="font-size: 1.2em; color: var(--success); margin-bottom: 30px;">O jogo acabou. Todos os outros pereceram.</p>
+            <button class="btn-padrao" style="font-size: 1.5em; padding: 15px;" onclick="voltarAoMenu()">Voltar ao Menu Principal</button>
+        </div>
+    </div>
+
+    <div id="modal-boas-vindas" class="modal-overlay">
+        <div class="modal-content" style="max-width: 500px; text-align: center; border-color: var(--success);">
+            <h1 style="color: var(--success); margin-top: 0; font-size: 2.5em;">O JOGO COMEÇOU!</h1>
+            <p style="font-size: 1.2em; color: #ccc;">Bem-vindos ao Tabuleiro Interativo!</p>
+            <div style="background: rgba(0,0,0,0.3); padding: 15px; border-radius: 8px; text-align: left; margin-bottom: 20px;">
+                <h4 style="color: var(--primary); margin-top: 0;">📜 O Objetivo:</h4>
+                <p>Sobreviva aos eventos criados pelo próprio chat! Seja o último jogador vivo e acumule riquezas.</p>
+                <h4 style="color: var(--primary);">🎮 Como jogar:</h4>
+                <p>Durante a live, o chat poderá inventar novas casas, regras malucas e itens. O Mestre irá aplicar tudo em tempo real!</p>
+            </div>
+            <button class="btn-padrao" style="font-size: 1.2em; padding: 15px;" onclick="fecharModal('modal-boas-vindas')">Entendido! Vamos Jogar!</button>
+        </div>
+    </div>
+
+    <div id="modal-alerta" class="modal-overlay" style="z-index: 2000;">
+        <div class="modal-content" style="max-width: 400px; text-align: center; border-color: #89b4fa;">
+            <h3 style="color: #89b4fa; margin-top: 0;">Aviso</h3>
+            <p id="alerta-msg" style="font-size: 1.1em;"></p>
+            <button class="btn-padrao" style="background-color: #89b4fa;" onclick="fecharAlerta()">OK</button>
+        </div>
+    </div>
+
+    <div id="modal-confirmacao" class="modal-overlay" style="z-index: 2000;">
+        <div class="modal-content" style="max-width: 400px; text-align: center; border-color: var(--accent);">
+            <h3 style="color: var(--accent); margin-top: 0;">Confirmação</h3>
+            <p id="confirm-msg" style="font-size: 1.1em;"></p>
+            <div style="display: flex; gap: 10px;">
+                <button class="btn-padrao" style="background-color: #555;" onclick="fecharConfirmacao(false)">Cancelar</button>
+                <button class="btn-padrao" style="background-color: var(--accent);" onclick="fecharConfirmacao(true)">Sim</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="modal-prompt" class="modal-overlay" style="z-index: 2000;">
+        <div class="modal-content" style="max-width: 400px; text-align: center; border-color: var(--success);">
+            <h3 id="prompt-titulo" style="color: var(--success); margin-top: 0;">Pergunta</h3>
+            <input type="text" id="prompt-input" style="font-size: 1.1em; padding: 10px; margin-bottom: 15px;">
+            <div style="display: flex; gap: 10px;">
+                <button class="btn-padrao" style="background-color: #555;" onclick="fecharPrompt(null)">Cancelar</button>
+                <button class="btn-padrao" style="background-color: var(--success);" onclick="fecharPrompt(document.getElementById('prompt-input').value)">Confirmar</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="modal-criar" class="modal-overlay">
+        <div class="modal-content">
+            <span class="fechar-modal" onclick="fecharModal('modal-criar')">&times;</span>
+            <h2 style="color: var(--primary); margin-top: 0;">➕ Central de Criação</h2>
+            <div class="grade-modal">
+                <div class="caixa-interna">
+                    <h4>Casa no Mapa</h4>
+                    <input type="text" id="casa-nome" placeholder="Nome da Casa">
+                    <input type="text" id="casa-efeito-master" placeholder="Descrição para a Live">
+                    <select id="casa-conexao1"><option value="Loja">Ligar à: Loja</option></select>
+                    <select id="casa-conexao2"><option value="">Conexão 2 (Op)</option></select>
+                    <button class="btn-padrao" id="btn-add-casa" onclick="criarCasa()">Adicionar ao Mapa</button>
+                </div>
+                <div class="caixa-interna">
+                    <h4>Item na Loja</h4>
+                    <input type="text" id="item-nome" placeholder="Nome do Item">
+                    <input type="number" id="item-preco" placeholder="Preço (Deixe 0 p/ Grátis)">
+                    <input type="text" id="item-efeito" placeholder="Efeito">
+                    <button class="btn-padrao" id="btn-add-item" onclick="criarItem()">Salvar Item</button>
+                </div>
+                <div class="caixa-interna">
+                    <h4>Nova Regra da Live</h4>
+                    <input type="text" id="regra-texto" placeholder="Ex: Proibido roubar...">
+                    <button class="btn-padrao" id="btn-add-regra" onclick="criarRegra()">Fixar</button>
+                    <hr style="border-color: #555; margin: 15px 0;">
+                    <h4>Criar Novo Status</h4>
+                    <input type="text" id="novo-status-nome" placeholder="Ex: Fome">
+                    <input type="number" id="novo-status-valor" placeholder="Valor Inicial">
+                    <button class="btn-padrao" id="btn-add-status" onclick="criarNovoStatus()">Add Status Global</button>
+                </div>
+                <div class="caixa-interna" style="border-color: var(--accent);">
+                    <h4 style="color: var(--accent);">⏰ Lembrete Automático</h4>
+                    <p style="font-size: 0.8em; color: #ccc; margin: 0 0 5px 0;">O jogo avisa na tela do mestre a cada X rodadas globais.</p>
+                    <input type="text" id="evento-msg" placeholder="Ex: Todos perdem 1 de Fome">
+                    <input type="number" id="evento-turnos" placeholder="Disparar a cada X Rodadas" min="1">
+                    <button class="btn-padrao" id="btn-add-evento" style="background-color: var(--accent);" onclick="criarEvento()">Criar Alarme</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="modal-sorteio" class="modal-overlay">
+        <div class="modal-content" style="max-width: 450px; text-align: center;">
+            <span class="fechar-modal" onclick="fecharModal('modal-sorteio')">&times;</span>
+            <h2 style="color: var(--accent); margin-top: 0;">🎲 Mesa de Dados</h2>
+            <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+                <button class="btn-padrao" onclick="sortear('casa')">Sortear Casa</button>
+                <button class="btn-padrao" onclick="sortear('item')">Sortear Item</button>
+            </div>
+            
+            <input type="text" id="input-sorteio-custom" placeholder="Ex: Ficar 25%, Morrer 75%">
+            
+            <div style="display: flex; gap: 5px; margin-top: 5px;">
+                <button class="btn-padrao" style="flex: 2; margin: 0;" onclick="sortear('custom')">Sortear Escrito</button>
+                <button class="btn-padrao" style="flex: 1; background-color: var(--success); color: #111; margin: 0;" onclick="salvarSorteioAtual()">💾 Salvar</button>
+            </div>
+
+            <div id="resultado-sorteio" style="margin-top: 20px; padding: 20px; background-color: rgba(0,0,0,0.6); border-radius: 8px; font-size: 1.5em; color: var(--success); font-weight: bold; min-height: 40px;">
+                <em>...</em>
+            </div>
+
+            <div style="margin-top: 20px; text-align: left;">
+                <h4 style="color: #ccc; border-bottom: 1px solid #444; padding-bottom: 5px; margin-bottom: 10px; font-size: 0.9em; text-transform: uppercase;">Salvos (Clique para sortear)</h4>
+                <div id="lista-sorteios-salvos" style="display: flex; flex-direction: column; gap: 5px; max-height: 150px; overflow-y: auto; padding-right: 5px;">
+                    <em style="color: #666; font-size: 0.85em;">Nenhum sorteio salvo.</em>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="modal-editar" class="modal-overlay">
+        <div class="modal-content">
+            <span class="fechar-modal" onclick="fecharModal('modal-editar')">&times;</span>
+            <h2 style="color: #89b4fa; margin-top: 0;">✏️ Editor em Tempo Real</h2>
+            <p style="font-size: 0.9em; color: #aaa;">Selecione o que deseja editar.</p>
+            <div class="grade-modal" id="listas-edicao"></div>
+        </div>
+    </div>
+
+    <div id="modal-chat" class="modal-overlay">
+        <div class="modal-content" style="max-width: 800px; border-color: var(--turn-color);">
+            <span class="fechar-modal" onclick="fecharModal('modal-chat')">&times;</span>
+            <h2 style="color: var(--turn-color); margin-top: 0; display: flex; align-items: center; gap: 10px; font-size: 2.2em;">💬 Chat do Turno</h2>
+            <p id="chat-subtitulo" style="font-size: 1.2em; color: #ccc; margin-top: -15px; margin-bottom: 20px;">Lendo mensagens de: ...</p>
+            
+            <div id="chat-jogador-atual" style="background-color: rgba(0,0,0,0.5); padding: 20px; border-radius: 8px; height: 500px; overflow-y: auto; display: flex; flex-direction: column; gap: 15px; border: 1px solid #444;">
+                <em style="color: #aaa; font-size: 1.2em; text-align: center; width: 100%; display: block; margin-top: 5px;">Aguardando mensagens...</em>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
