@@ -1,6 +1,6 @@
 // ================= Variáveis Globais =================
-let smkoins = 0;
-let sps = 0; 
+let smkoins = 1e33;
+let sps = 0;
 let cliquesTotais = 0;
 let estruturasCompradasTotais = 0;
 
@@ -12,16 +12,16 @@ let multiplicadorCompra = 1; // <--- Adicione esta linha
 function formatarNumero(num) {
     if (num < 1000000) return Math.floor(num).toLocaleString('pt-BR');
     const sufixos = [
-        { valor: 1e93,nome: 'Trigintilhões' }, { valor: 1e90,nome: 'Novemvigintilhões' }, { valor: 1e87,nome: 'Octovigintilhões' },
-        { valor: 1e84,nome: 'Septenvigintilhões' }, { valor: 1e81,nome: 'Sexvigintilhões' }, { valor: 1e78,nome: 'Quinvigintilhões' },
-        { valor: 1e75,nome: 'Quatuorvigintilhões' }, { valor: 1e72,nome: 'Trevigintilhões' }, { valor: 1e69,nome: 'Duovigintilhões' },
-        { valor: 1e66,nome: 'Unvigintilhões' }, { valor: 1e63,nome: 'Vigintilhões' }, { valor: 1e60,nome: 'Novemdecilhões' },
-        { valor: 1e57,nome: 'Octodecilhões' }, { valor: 1e54,nome: 'Septendecilhões' }, { valor: 1e51,nome: 'Sexdecilhões' },
-        { valor: 1e48,nome: 'Quindecilhões' }, { valor: 1e45,nome: 'Quatuordecilhões' }, { valor: 1e42,nome: 'Tredecilhões' },
-        { valor: 1e39,nome: 'Duodecilhões' }, { valor: 1e36,nome: 'Undecilhões' }, { valor: 1e33,nome: 'Decilhões' },
-        { valor: 1e30,nome: 'Nonilhões' }, { valor: 1e27,nome: 'Octilhões' }, { valor: 1e24,nome: 'Septilhões' },
-        { valor: 1e21,nome: 'Sextilhões' }, { valor: 1e18,nome: 'Quintilhões' }, { valor: 1e15,nome: 'Quatrilhões' },
-        { valor: 1e12,nome: 'Trilhões' }, { valor: 1e9,  nome: 'Bilhões' }, { valor: 1e6,  nome: 'Milhões' }
+        { valor: 1e93, nome: 'Trigintilhões' }, { valor: 1e90, nome: 'Novemvigintilhões' }, { valor: 1e87, nome: 'Octovigintilhões' },
+        { valor: 1e84, nome: 'Septenvigintilhões' }, { valor: 1e81, nome: 'Sexvigintilhões' }, { valor: 1e78, nome: 'Quinvigintilhões' },
+        { valor: 1e75, nome: 'Quatuorvigintilhões' }, { valor: 1e72, nome: 'Trevigintilhões' }, { valor: 1e69, nome: 'Duovigintilhões' },
+        { valor: 1e66, nome: 'Unvigintilhões' }, { valor: 1e63, nome: 'Vigintilhões' }, { valor: 1e60, nome: 'Novemdecilhões' },
+        { valor: 1e57, nome: 'Octodecilhões' }, { valor: 1e54, nome: 'Septendecilhões' }, { valor: 1e51, nome: 'Sexdecilhões' },
+        { valor: 1e48, nome: 'Quindecilhões' }, { valor: 1e45, nome: 'Quatuordecilhões' }, { valor: 1e42, nome: 'Tredecilhões' },
+        { valor: 1e39, nome: 'Duodecilhões' }, { valor: 1e36, nome: 'Undecilhões' }, { valor: 1e33, nome: 'Decilhões' },
+        { valor: 1e30, nome: 'Nonilhões' }, { valor: 1e27, nome: 'Octilhões' }, { valor: 1e24, nome: 'Septilhões' },
+        { valor: 1e21, nome: 'Sextilhões' }, { valor: 1e18, nome: 'Quintilhões' }, { valor: 1e15, nome: 'Quatrilhões' },
+        { valor: 1e12, nome: 'Trilhões' }, { valor: 1e9, nome: 'Bilhões' }, { valor: 1e6, nome: 'Milhões' }
     ];
     for (let i = 0; i < sufixos.length; i++) {
         if (num >= sufixos[i].valor) {
@@ -48,58 +48,58 @@ const estruturas = [
 // O "icone" aceita Emoji ou uma URL de imagem (ex: "url('img/mouse.png')")
 let upgrades = [
     // Upgrades Globais
-    { id: 'cafe_expresso', icone: '🌎', nome: 'Garrafa de Café Expresso', desc: 'Duplica TODAS as estruturas (SPS x2). O streamer não dorme, a live não para.', custo: 100000, comprado: false, tipo: 'global', visivel: true },
-    { id: 'cadeira_ergonomica', icone: '🌎', nome: 'Cadeira Gamer Ergonômica', desc: 'Duplica TODAS as estruturas (SPS x2). Fim das dores nas costas, lives de 12 horas desbloqueadas.', custo: 5000000, comprado: false, tipo: 'global', reqUpg: 'cafe_expresso', visivel: false }, // 5 Milhões
-    { id: 'fibra_optica', icone: '🌎', nome: 'Internet Fibra Óptica 1 Giga', desc: 'Duplica TODAS as estruturas (SPS x2). Zero lag de upload, a transmissão flui na velocidade da luz.', custo: 250000000, comprado: false, tipo: 'global', reqUpg: 'cadeira_ergonomica', visivel: false }, // 250 Milhões
-    { id: 'iluminacao_pro', icone: '🌎', nome: 'Kit de Softbox e LEDs', desc: 'Duplica TODAS as estruturas (SPS x2). A iluminação profissional deixa a webcam com cara de cinema.', custo: 15000000000, comprado: false, tipo: 'global', reqUpg: 'fibra_optica', visivel: false }, // 15 Bilhões
-    { id: 'mic_estudio', icone: '🌎', nome: 'Microfone Condensador de Estúdio', desc: 'Duplica TODAS as estruturas (SPS x2). Voz de locutor de rádio, retenção máxima de público no Just Chatting.', custo: 1000000000000, comprado: false, tipo: 'global', reqUpg: 'iluminacao_pro', visivel: false }, // 1 Trilhão
-    { id: 'camera_4k', icone: '🌎', nome: 'Câmera Mirrorless 4K', desc: 'Duplica TODAS as estruturas (SPS x2). Cada poro do seu rosto é renderizado em altíssima definição.', custo: 75000000000000, comprado: false, tipo: 'global', reqUpg: 'mic_estudio', visivel: false }, // 75 Trilhões
-    { id: 'dual_pc', icone: '🌎', nome: 'Setup Dual PC da NASA', desc: 'Duplica TODAS as estruturas (SPS x2). Jogar EA FC, Cyberpunk e streamar ao mesmo tempo sem perder 1 frame.', custo: 5e15, comprado: false, tipo: 'global', reqUpg: 'camera_4k', visivel: false }, // 5 Quadrilhões
-    { id: 'selo_parceiro', icone: '🌎', nome: 'Parceria Oficial (Verificado)', desc: 'Duplica TODAS as estruturas (SPS x2). O algoritmo da Twitch finalmente te nota e recomenda pra todo mundo.', custo: 500e15, comprado: false, tipo: 'global', reqUpg: 'dual_pc', visivel: false }, // 500 Quadrilhões
-    { id: 'patrocinio_marca', icone: '🌎', nome: 'Patrocínio Master', desc: 'Duplica TODAS as estruturas (SPS x2). Orçamento milionário entra no canal para bancar os eventos mais insanos.', custo: 50e18, comprado: false, tipo: 'global', reqUpg: 'selo_parceiro', visivel: false }, // 50 Quintilhões
-    { id: 'estudio_proprio', icone: '🌎', nome: 'Estúdio Próprio Isolado', desc: 'Duplica TODAS as estruturas (SPS x2). Acústica perfeita, cenário impecável, hype incontrolável.', custo: 5e21, comprado: false, tipo: 'global', reqUpg: 'patrocinio_marca', visivel: false }, // 5 Sextilhões
-    { id: 'transmissao_neural', icone: '🌎', nome: 'Transmissão Neural Borboleta', desc: 'Duplica TODAS as estruturas (SPS x2). Você transmite a live diretamente para a mente da sua comunidade.', custo: 500e21, comprado: false, tipo: 'global', reqUpg: 'estudio_proprio', visivel: false }, // 500 Sextilhões
-    
-    // Upgrades de Clique
-    { id: 'mouse_bolinha', icone: '👆', nome: 'Mouse de Bolinha', desc: 'Dobra a eficiência dos cliques.', custo: 100, comprado: false, tipo: 'clique', requisitoCliques: 50, visivel: false },
-    { id: 'mouse_optico', icone: '👆', nome: 'Mouse Óptico Genérico', desc: 'Dobra a eficiência dos cliques.', custo: 1000, comprado: false, tipo: 'clique', requisitoCliques: 250, visivel: false }, // ~1k
-    { id: 'mouse_escritorio', icone: '👆', nome: 'Mouse Sem Fio de Escritório', desc: 'Dobra a eficiência dos cliques.', custo: 10000, comprado: false, tipo: 'clique', requisitoCliques: 1000, visivel: false }, // ~10k
-    { id: 'mouse_gamer', icone: '👆', nome: 'Mouse Gamer de Entrada (RGB)', desc: 'Dobra a eficiência dos cliques.', custo: 100000, comprado: false, tipo: 'clique', requisitoCliques: 2500, visivel: false }, // ~100k
-    { id: 'mouse_paracord', icone: '👆', nome: 'Mouse com Cabo Paracord', desc: 'Dobra a eficiência dos cliques.', custo: 5000000, comprado: false, tipo: 'clique', requisitoCliques: 10000, visivel: false }, // ~5M
-    { id: 'mouse_ultraleve', icone: '👆', nome: 'Mouse Gamer Ultraleve (Colmeia)', desc: 'Dobra a eficiência dos cliques.', custo: 500000000, comprado: false, tipo: 'clique', requisitoCliques: 25000, visivel: false }, // ~500M
-    { id: 'mouse_superlight', icone: '👆', nome: 'Mouse Sem Fio Pro Superlight', desc: 'Dobra a eficiência dos cliques.', custo: 50000000000, comprado: false, tipo: 'clique', requisitoCliques: 50000, visivel: false }, // ~50B
-    { id: 'mouse_8k', icone: '👆', nome: 'Mouse com Sensor 8000Hz', desc: 'Dobra a eficiência dos cliques.', custo: 5000000000000, comprado: false, tipo: 'clique', requisitoCliques: 100000, visivel: false }, // ~5T
-    { id: 'mouse_quantico', icone: '👆', nome: 'Mouse Óptico-Mecânico Quântico', desc: 'Dobra a eficiência dos cliques.', custo: 500000000000000, comprado: false, tipo: 'clique', requisitoCliques: 250000, visivel: false }, // ~500T
-    { id: 'mouse_neural', icone: '👆', nome: 'Mouse de Neuro-Conexão', desc: 'Dobra a eficiência dos cliques.', custo: 50e15, comprado: false, tipo: 'clique', requisitoCliques: 500000, visivel: false }, // ~50Qa
-    { id: 'mouse_borboleta', icone: '👆', nome: 'A Borboleta Digital (Mouse Supremo)', desc: 'Dobra a eficiência dos cliques.', custo: 5e18, comprado: false, tipo: 'clique', requisitoCliques: 1000000, visivel: false }, // ~5Qi
-    
-    // Upgrades Lurkers
-    { id: 'abafixada', icone: '📌', nome: 'Aba Fixada', desc: 'Dobra o SPS dos Lurkers. Eles não fecham mais o navegador sem querer.', custo: 150, comprado: false, tipo: 'estrutura', alvo: 'lurkers', reqEstruturaQtd: 1, visivel: false },
-    { id: 'abamutada', icone: '📌', nome: 'Aba Mutada', desc: 'Dobra o SPS dos Lurkers. Menos barulho, mais farm de views.', custo: 5000, comprado: false, tipo: 'estrutura', alvo: 'lurkers', reqEstruturaQtd: 25, visivel: false }, // ~5 Mil
-    { id: 'qualidade160p', icone: '📌', nome: 'Qualidade 160p', desc: 'Dobra o SPS dos Lurkers. Economizando internet para focar em deixar a live aberta.', custo: 150000, comprado: false, tipo: 'estrutura', alvo: 'lurkers', reqEstruturaQtd: 50, visivel: false }, // ~150 Mil
-    { id: 'escondidonotrabalho', icone: '📌', nome: 'Escondido no Trabalho', desc: 'Dobra o SPS dos Lurkers. O chefe achou que era uma planilha.', custo: 150000000, comprado: false, tipo: 'estrutura', alvo: 'lurkers', reqEstruturaQtd: 100, visivel: false }, // ~150 Milhões
-    { id: 'pcligadodemadrugada', icone: '📌', nome: 'PC Ligado de Madrugada', desc: 'Dobra o SPS dos Lurkers. A live rolando solta enquanto eles dormem.', custo: 200000000000, comprado: false, tipo: 'estrutura', alvo: 'lurkers', reqEstruturaQtd: 150, visivel: false }, // ~200 Bilhões
-    { id: 'segundomonitor', icone: '📌', nome: 'Segundo Monitor', desc: 'Dobra o SPS dos Lurkers. A stream agora é parte definitiva do setup deles.', custo: 200e12, comprado: false, tipo: 'estrutura', alvo: 'lurkers', reqEstruturaQtd: 200, visivel: false }, // ~200 Trilhões
-    { id: 'celularnagaveta', icone: '📌', nome: 'Celular na Gaveta', desc: 'Dobra o SPS dos Lurkers. Bateria viciada, mas a view tá contando.', custo: 250e15, comprado: false, tipo: 'estrutura', alvo: 'lurkers', reqEstruturaQtd: 250, visivel: false }, // ~250 Quadrilhões
-    { id: 'antiinatividade', icone: '📌', nome: 'Extensão Anti-Inatividade', desc: 'Dobra o SPS dos Lurkers. Um script impede a Twitch de pausar o vídeo.', custo: 250e18, comprado: false, tipo: 'estrutura', alvo: 'lurkers', reqEstruturaQtd: 300, visivel: false }, // ~250 Quintilhões
-    { id: 'lurkerprofissional', icone: '📌', nome: 'Lurker Profissional', desc: 'Dobra o SPS dos Lurkers. Eles não assistem mais à live, eles habitam a live.', custo: 300e21, comprado: false, tipo: 'estrutura', alvo: 'lurkers', reqEstruturaQtd: 350, visivel: false }, // ~300 Sextilhões
-    { id: 'entidadeonipresente', icone: '📌', nome: 'Entidade Onipresente', desc: 'Dobra o SPS dos Lurkers. Um espírito ancestral que contabiliza +1 viewer.', custo: 300e24, comprado: false, tipo: 'estrutura', alvo: 'lurkers', reqEstruturaQtd: 400, visivel: false }, // ~300 Septilhões
-    { id: 'sombraborboleta', icone: '📌', nome: 'A Sombra da Borboleta', desc: 'Dobra o SPS dos Lurkers. O silêncio absoluto se converte em hype infinito.', custo: 350e27, comprado: false, tipo: 'estrutura', alvo: 'lurkers', reqEstruturaQtd: 450, visivel: false }, // ~350 Octilhões
-    
-    // Upgrades Mods
-    { id: 'banhammer', icone: '🔨', nome: 'Ban Hammer de Ouro', desc: 'Dobra o SPS dos Moderadores. O chat não ousa mais pisar fora da linha.', custo: 1000, comprado: false, tipo: 'estrutura', alvo: 'mods', reqEstruturaQtd: 1, visivel: false },
-    { id: 'nightbot', icone: '🔨', nome: 'Nightbot Configurado', desc: 'Dobra o SPS dos Moderadores. Comandos automáticos trabalhando por você.', custo: 35000, comprado: false, tipo: 'estrutura', alvo: 'mods', reqEstruturaQtd: 25, visivel: false }, // ~35 Mil
-    { id: 'filtro_palavras', icone: '🔨', nome: 'Filtro de Palavras Implacável', desc: 'Dobra o SPS dos Moderadores. Copypastas chatas são destruídas na velocidade da luz.', custo: 1200000, comprado: false, tipo: 'estrutura', alvo: 'mods', reqEstruturaQtd: 50, visivel: false }, // ~1.2 Milhões
-    { id: 'modo_seguidores', icone: '🔨', nome: 'Modo Apenas Seguidores', desc: 'Dobra o SPS dos Moderadores. Espanta os trolls e foca na comunidade.', custo: 1200000000, comprado: false, tipo: 'estrutura', alvo: 'mods', reqEstruturaQtd: 100, visivel: false }, // ~1.2 Bilhões
-    { id: 'visao_raiox', icone: '🔨', nome: 'Painel de Mod em Segundo Monitor', desc: 'Dobra o SPS dos Moderadores. Visão completa de logs e histórico dos baderneiros.', custo: 1300000000000, comprado: false, tipo: 'estrutura', alvo: 'mods', reqEstruturaQtd: 150, visivel: false }, // ~1.3 Trilhões
-    { id: 'delay_chat', icone: '🔨', nome: 'Modo Lento e Delay Tático', desc: 'Dobra o SPS dos Moderadores. Tempo exato para apagar a mensagem antes do streamer ler.', custo: 1.5e15, comprado: false, tipo: 'estrutura', alvo: 'mods', reqEstruturaQtd: 200, visivel: false }, // ~1.5 Quadrilhões
-    { id: 'tropa_vips', icone: '🔨', nome: 'Milícia de VIPs', desc: 'Dobra o SPS dos Moderadores. Subornando a galera ativa com a espadinha para ajudar a vigiar.', custo: 1.5e18, comprado: false, tipo: 'estrutura', alvo: 'mods', reqEstruturaQtd: 250, visivel: false }, // ~1.5 Quintilhões
-    { id: 'skynet_mods', icone: '🔨', nome: 'Exército de Bots Anti-Spam', desc: 'Dobra o SPS dos Moderadores. A inteligência artificial assumiu a ordem do chat.', custo: 1.8e21, comprado: false, tipo: 'estrutura', alvo: 'mods', reqEstruturaQtd: 300, visivel: false }, // ~1.8 Sextilhões
-    { id: 'ban_interdimensional', icone: '🔨', nome: 'Banimento Interdimensional', desc: 'Dobra o SPS dos Moderadores. O troll é banido de todas as realidades alternativas da Twitch.', custo: 2e24, comprado: false, tipo: 'estrutura', alvo: 'mods', reqEstruturaQtd: 350, visivel: false }, // ~2 Septilhões
-    { id: 'juizo_final', icone: '🔨', nome: 'O Juízo Final do Chat', desc: 'Dobra o SPS dos Moderadores. O botão de "Limpar Chat" agora purifica a alma dos viewers.', custo: 2e27, comprado: false, tipo: 'estrutura', alvo: 'mods', reqEstruturaQtd: 400, visivel: false }, // ~2 Octilhões
-    { id: 'espada_nikk', icone: '🔨', nome: 'A Espada Ancestral da Nikk', desc: 'Dobra o SPS dos Moderadores. A lenda da moderação abençoa a equipe com controle absoluto.', custo: 2.5e30, comprado: false, tipo: 'estrutura', alvo: 'mods', reqEstruturaQtd: 450, visivel: false }, // ~2.5 Nonilhões
+    { id: 'cafe_expresso', icone: "url('global/global-1.png')", nome: 'Garrafa de Café Expresso', desc: 'Duplica TODAS as estruturas (SPS x2). O streamer não dorme, a live não para.', custo: 100000, comprado: false, tipo: 'global', visivel: true },
+    { id: 'cadeira_ergonomica', icone: "url('global/global-2.png')", nome: 'Cadeira Gamer Ergonômica', desc: 'Duplica TODAS as estruturas (SPS x2). Fim das dores nas costas, lives de 12 horas desbloqueadas.', custo: 5000000, comprado: false, tipo: 'global', reqUpg: 'cafe_expresso', visivel: false }, // 5 Milhões
+    { id: 'fibra_optica', icone: "url('global/global-3.png')", nome: 'Internet Fibra Óptica 1 Giga', desc: 'Duplica TODAS as estruturas (SPS x2). Zero lag de upload, a transmissão flui na velocidade da luz.', custo: 250000000, comprado: false, tipo: 'global', reqUpg: 'cadeira_ergonomica', visivel: false }, // 250 Milhões
+    { id: 'iluminacao_pro', icone: "url('global/global-4.png')", nome: 'Kit de Softbox e LEDs', desc: 'Duplica TODAS as estruturas (SPS x2). A iluminação profissional deixa a webcam com cara de cinema.', custo: 15000000000, comprado: false, tipo: 'global', reqUpg: 'fibra_optica', visivel: false }, // 15 Bilhões
+    { id: 'mic_estudio', icone: "url('global/global-5.png')", nome: 'Microfone Condensador de Estúdio', desc: 'Duplica TODAS as estruturas (SPS x2). Voz de locutor de rádio, retenção máxima de público no Just Chatting.', custo: 1000000000000, comprado: false, tipo: 'global', reqUpg: 'iluminacao_pro', visivel: false }, // 1 Trilhão
+    { id: 'camera_4k', icone: "url('global/global-6.png')", nome: 'Câmera Mirrorless 4K', desc: 'Duplica TODAS as estruturas (SPS x2). Cada poro do seu rosto é renderizado em altíssima definição.', custo: 75000000000000, comprado: false, tipo: 'global', reqUpg: 'mic_estudio', visivel: false }, // 75 Trilhões
+    { id: 'dual_pc', icone: "url('global/global-7.png')", nome: 'Setup Dual PC da NASA', desc: 'Duplica TODAS as estruturas (SPS x2). Jogar EA FC, Cyberpunk e streamar ao mesmo tempo sem perder 1 frame.', custo: 5e15, comprado: false, tipo: 'global', reqUpg: 'camera_4k', visivel: false }, // 5 Quadrilhões
+    { id: 'selo_parceiro', icone: "url('global/global-8.png')", nome: 'Parceria Oficial (Verificado)', desc: 'Duplica TODAS as estruturas (SPS x2). O algoritmo da Twitch finalmente te nota e recomenda pra todo mundo.', custo: 500e15, comprado: false, tipo: 'global', reqUpg: 'dual_pc', visivel: false }, // 500 Quadrilhões
+    { id: 'patrocinio_marca', icone: "url('global/global-9.png')", nome: 'Patrocínio Master', desc: 'Duplica TODAS as estruturas (SPS x2). Orçamento milionário entra no canal para bancar os eventos mais insanos.', custo: 50e18, comprado: false, tipo: 'global', reqUpg: 'selo_parceiro', visivel: false }, // 50 Quintilhões
+    { id: 'estudio_proprio', icone: "url('global/global-10.png')", nome: 'Estúdio Próprio Isolado', desc: 'Duplica TODAS as estruturas (SPS x2). Acústica perfeita, cenário impecável, hype incontrolável.', custo: 5e21, comprado: false, tipo: 'global', reqUpg: 'patrocinio_marca', visivel: false }, // 5 Sextilhões
+    { id: 'transmissao_neural', icone: "url('global/global-11.png')", nome: 'Transmissão Neural Borboleta', desc: 'Duplica TODAS as estruturas (SPS x2). Você transmite a live diretamente para a mente da sua comunidade.', custo: 500e21, comprado: false, tipo: 'global', reqUpg: 'estudio_proprio', visivel: false }, // 500 Sextilhões
 
-     // Upgrades Fundadores
+    // Upgrades de Clique
+    { id: 'mouse_bolinha', icone: "url('clicker/clicker-1.png')", nome: 'Mouse de Bolinha', desc: 'Dobra a eficiência dos cliques.', custo: 100, comprado: false, tipo: 'clique', requisitoCliques: 50, visivel: false },
+    { id: 'mouse_optico', icone: "url('clicker/clicker-2.png')", nome: 'Mouse Óptico Genérico', desc: 'Dobra a eficiência dos cliques.', custo: 1000, comprado: false, tipo: 'clique', requisitoCliques: 250, visivel: false }, // ~1k
+    { id: 'mouse_escritorio', icone: "url('clicker/clicker-3.png')", nome: 'Mouse Sem Fio de Escritório', desc: 'Dobra a eficiência dos cliques.', custo: 10000, comprado: false, tipo: 'clique', requisitoCliques: 1000, visivel: false }, // ~10k
+    { id: 'mouse_gamer', icone: "url('clicker/clicker-4.png')", nome: 'Mouse Gamer de Entrada (RGB)', desc: 'Dobra a eficiência dos cliques.', custo: 100000, comprado: false, tipo: 'clique', requisitoCliques: 2500, visivel: false }, // ~100k
+    { id: 'mouse_paracord', icone: "url('clicker/clicker-5.png')", nome: 'Mouse com Cabo Paracord', desc: 'Dobra a eficiência dos cliques.', custo: 5000000, comprado: false, tipo: 'clique', requisitoCliques: 10000, visivel: false }, // ~5M
+    { id: 'mouse_ultraleve', icone: "url('clicker/clicker-6.png')", nome: 'Mouse Gamer Ultraleve (Colmeia)', desc: 'Dobra a eficiência dos cliques.', custo: 500000000, comprado: false, tipo: 'clique', requisitoCliques: 25000, visivel: false }, // ~500M
+    { id: 'mouse_superlight', icone: "url('clicker/clicker-7.png')", nome: 'Mouse Sem Fio Pro Superlight', desc: 'Dobra a eficiência dos cliques.', custo: 50000000000, comprado: false, tipo: 'clique', requisitoCliques: 50000, visivel: false }, // ~50B
+    { id: 'mouse_8k', icone: "url('clicker/clicker-8.png')", nome: 'Mouse com Sensor 8000Hz', desc: 'Dobra a eficiência dos cliques.', custo: 5000000000000, comprado: false, tipo: 'clique', requisitoCliques: 100000, visivel: false }, // ~5T
+    { id: 'mouse_quantico', icone: "url('clicker/clicker-9.png')", nome: 'Mouse Óptico-Mecânico Quântico', desc: 'Dobra a eficiência dos cliques.', custo: 500000000000000, comprado: false, tipo: 'clique', requisitoCliques: 250000, visivel: false }, // ~500T
+    { id: 'mouse_neural', icone: "url('clicker/clicker-10.png')", nome: 'Mouse de Neuro-Conexão', desc: 'Dobra a eficiência dos cliques.', custo: 50e15, comprado: false, tipo: 'clique', requisitoCliques: 500000, visivel: false }, // ~50Qa
+    { id: 'mouse_borboleta', icone: "url('clicker/clicker-11.png')", nome: 'A Borboleta Digital (Mouse Supremo)', desc: 'Dobra a eficiência dos cliques.', custo: 5e18, comprado: false, tipo: 'clique', requisitoCliques: 1000000, visivel: false }, // ~5Qi
+
+    // Upgrades Lurkers
+    { id: 'abafixada', icone: "url('lurk/lurk-1.png')", nome: 'Aba Fixada', desc: 'Dobra o SPS dos Lurkers. Eles não fecham mais o navegador sem querer.', custo: 100, comprado: false, tipo: 'estrutura', alvo: 'lurkers', reqEstruturaQtd: 1, visivel: false },// ~100
+    { id: 'abamutada', icone: "url('lurk/lurk-2.png')", nome: 'Aba Mutada', desc: 'Dobra o SPS dos Lurkers. Menos barulho, mais farm de views.', custo: 10000, comprado: false, tipo: 'estrutura', alvo: 'lurkers', reqEstruturaQtd: 10, visivel: false }, // ~10 Mil
+    { id: 'qualidade160p', icone: "url('lurk/lurk-3.png')", nome: 'Qualidade 160p', desc: 'Dobra o SPS dos Lurkers. Economizando internet para focar em deixar a live aberta.', custo: 100000, comprado: false, tipo: 'estrutura', alvo: 'lurkers', reqEstruturaQtd: 25, visivel: false }, // ~100 Mil
+    { id: 'escondidonotrabalho', icone: "url('lurk/lurk-4.png')", nome: 'Escondido no Trabalho', desc: 'Dobra o SPS dos Lurkers. O chefe achou que era uma planilha.', custo: 10000000, comprado: false, tipo: 'estrutura', alvo: 'lurkers', reqEstruturaQtd: 50, visivel: false }, // ~10 Milhões
+    { id: 'pcligadodemadrugada', icone: "url('lurk/lurk-5.png')", nome: 'PC Ligado de Madrugada', desc: 'Dobra o SPS dos Lurkers. A live rolando solta enquanto eles dormem.', custo: 100000000, comprado: false, tipo: 'estrutura', alvo: 'lurkers', reqEstruturaQtd: 100, visivel: false }, // ~100 Milhões
+    { id: 'segundomonitor', icone: "url('lurk/lurk-6.png')", nome: 'Segundo Monitor', desc: 'Dobra o SPS dos Lurkers. A stream agora é parte definitiva do setup deles.', custo: 1e9, comprado: false, tipo: 'estrutura', alvo: 'lurkers', reqEstruturaQtd: 150, visivel: false }, // ~1 Bilhão
+    { id: 'celularnagaveta', icone: "url('lurk/lurk-7.png')", nome: 'Celular na Gaveta', desc: 'Dobra o SPS dos Lurkers. Bateria viciada, mas a view tá contando.', custo: 10e9, comprado: false, tipo: 'estrutura', alvo: 'lurkers', reqEstruturaQtd: 200, visivel: false }, // ~10 Bilhões
+    { id: 'antiinatividade', icone: "url('lurk/lurk-8.png')", nome: 'Extensão Anti-Inatividade', desc: 'Dobra o SPS dos Lurkers. Um script impede a Twitch de pausar o vídeo.', custo: 10e12, comprado: false, tipo: 'estrutura', alvo: 'lurkers', reqEstruturaQtd: 250, visivel: false }, // ~10 Trilhões
+    { id: 'lurkerprofissional', icone: "url('lurk/lurk-9.png')", nome: 'Lurker Profissional', desc: 'Dobra o SPS dos Lurkers. Eles não assistem mais à live, eles habitam a live.', custo: 10e15, comprado: false, tipo: 'estrutura', alvo: 'lurkers', reqEstruturaQtd: 300, visivel: false }, // ~10 Quadrilhões
+    { id: 'entidadeonipresente', icone: "url('lurk/lurk-10.png')", nome: 'Entidade Onipresente', desc: 'Dobra o SPS dos Lurkers. Um espírito ancestral que contabiliza +1 viewer.', custo: 10e18, comprado: false, tipo: 'estrutura', alvo: 'lurkers', reqEstruturaQtd: 350, visivel: false }, // ~10 Quintilhões
+    { id: 'sombraborboleta', icone: "url('lurk/lurk-11.png')", nome: 'A Sombra da Borboleta', desc: 'Dobra o SPS dos Lurkers. O silêncio absoluto se converte em hype infinito.', custo: 10e21, comprado: false, tipo: 'estrutura', alvo: 'lurkers', reqEstruturaQtd: 400, visivel: false }, // ~10 Sextilhões
+
+    // Upgrades Mods
+    { id: 'banhammer', icone: "url('mod/mod-1.png')", nome: 'Ban Hammer de Ouro', desc: 'Dobra o SPS dos Moderadores. O chat não ousa mais pisar fora da linha.', custo: 1000, comprado: false, tipo: 'estrutura', alvo: 'mods', reqEstruturaQtd: 1, visivel: false },
+    { id: 'nightbot', icone: "url('mod/mod-2.png')", nome: 'Nightbot Configurado', desc: 'Dobra o SPS dos Moderadores. Comandos automáticos trabalhando por você.', custo: 35000, comprado: false, tipo: 'estrutura', alvo: 'mods', reqEstruturaQtd: 25, visivel: false }, // ~35 Mil
+    { id: 'filtro_palavras', icone: "url('mod/mod-3.png')", nome: 'Filtro de Palavras Implacável', desc: 'Dobra o SPS dos Moderadores. Copypastas chatas são destruídas na velocidade da luz.', custo: 1200000, comprado: false, tipo: 'estrutura', alvo: 'mods', reqEstruturaQtd: 50, visivel: false }, // ~1.2 Milhões
+    { id: 'modo_seguidores', icone: "url('mod/mod-4.png')", nome: 'Modo Apenas Seguidores', desc: 'Dobra o SPS dos Moderadores. Espanta os trolls e foca na comunidade.', custo: 1200000000, comprado: false, tipo: 'estrutura', alvo: 'mods', reqEstruturaQtd: 100, visivel: false }, // ~1.2 Bilhões
+    { id: 'visao_raiox', icone: "url('mod/mod-5.png')", nome: 'Painel de Mod em Segundo Monitor', desc: 'Dobra o SPS dos Moderadores. Visão completa de logs e histórico dos baderneiros.', custo: 1300000000000, comprado: false, tipo: 'estrutura', alvo: 'mods', reqEstruturaQtd: 150, visivel: false }, // ~1.3 Trilhões
+    { id: 'delay_chat', icone: "url('mod/mod-6.png')", nome: 'Modo Lento e Delay Tático', desc: 'Dobra o SPS dos Moderadores. Tempo exato para apagar a mensagem antes do streamer ler.', custo: 1.5e15, comprado: false, tipo: 'estrutura', alvo: 'mods', reqEstruturaQtd: 200, visivel: false }, // ~1.5 Quadrilhões
+    { id: 'tropa_vips', icone: "url('mod/mod-7.png')", nome: 'Milícia de VIPs', desc: 'Dobra o SPS dos Moderadores. Subornando a galera ativa com a espadinha para ajudar a vigiar.', custo: 1.5e18, comprado: false, tipo: 'estrutura', alvo: 'mods', reqEstruturaQtd: 250, visivel: false }, // ~1.5 Quintilhões
+    { id: 'skynet_mods', icone: "url('mod/mod-8.png')", nome: 'Exército de Bots Anti-Spam', desc: 'Dobra o SPS dos Moderadores. A inteligência artificial assumiu a ordem do chat.', custo: 1.8e21, comprado: false, tipo: 'estrutura', alvo: 'mods', reqEstruturaQtd: 300, visivel: false }, // ~1.8 Sextilhões
+    { id: 'ban_interdimensional', icone: "url('mod/mod-9.png')", nome: 'Banimento Interdimensional', desc: 'Dobra o SPS dos Moderadores. O troll é banido de todas as realidades alternativas da Twitch.', custo: 2e24, comprado: false, tipo: 'estrutura', alvo: 'mods', reqEstruturaQtd: 350, visivel: false }, // ~2 Septilhões
+    { id: 'juizo_final', icone: "url('mod/mod-10.png')", nome: 'O Juízo Final do Chat', desc: 'Dobra o SPS dos Moderadores. O botão de "Limpar Chat" agora purifica a alma dos viewers.', custo: 2e27, comprado: false, tipo: 'estrutura', alvo: 'mods', reqEstruturaQtd: 400, visivel: false }, // ~2 Octilhões
+    { id: 'espada_nikk', icone: "url('mod/mod-11.png')", nome: 'A Espada Ancestral da Nikk', desc: 'Dobra o SPS dos Moderadores. A lenda da moderação abençoa a equipe com controle absoluto.', custo: 2.5e30, comprado: false, tipo: 'estrutura', alvo: 'mods', reqEstruturaQtd: 450, visivel: false }, // ~2.5 Nonilhões
+
+    // Upgrades Fundadores
     { id: '1mes', icone: '👑', nome: '1 Mês de Sub', desc: 'Dobra o SPS dos Fundadores.', custo: 15000, comprado: false, tipo: 'estrutura', alvo: 'fundadores', reqEstruturaQtd: 1, visivel: false }, // ~15 Mil
     { id: '3meses', icone: '👑', nome: '3 Meses de Sub', desc: 'Dobra o SPS dos Fundadores.', custo: 500000, comprado: false, tipo: 'estrutura', alvo: 'fundadores', reqEstruturaQtd: 25, visivel: false }, // ~500 Mil
     { id: '6meses', icone: '👑', nome: '6 Meses de Sub', desc: 'Dobra o SPS dos Fundadores.', custo: 18000000, comprado: false, tipo: 'estrutura', alvo: 'fundadores', reqEstruturaQtd: 50, visivel: false }, // ~18 Milhões
@@ -208,7 +208,7 @@ function carregarJogo() {
         smkoins = save.smkoins || 0;
         cliquesTotais = save.cliquesTotais || 0;
         estruturasCompradasTotais = save.estruturasCompradasTotais || 0;
-        
+
         // Carrega estruturas pelo ID
         if (save.estruturas && save.estruturas[0].id) {
             save.estruturas.forEach(s => {
@@ -237,14 +237,14 @@ function carregarJogo() {
         multiplicadorClique = 1;
         multiplicadorSPSGlobal = 1;
         estruturas.forEach(e => e.mult = 1);
-        
+
         if (!save.estruturasCompradasTotais) {
             estruturasCompradasTotais = 0;
             estruturas.forEach(e => estruturasCompradasTotais += e.qtd);
         }
 
         upgrades.forEach(u => {
-            if(u.comprado) {
+            if (u.comprado) {
                 if (u.tipo === 'clique') multiplicadorClique *= 2;
                 if (u.tipo === 'global') multiplicadorSPSGlobal *= 2;
                 if (u.tipo === 'estrutura') {
@@ -261,7 +261,7 @@ function carregarJogo() {
 }
 
 function resetarJogo() {
-    if(confirm('Tem certeza que deseja apagar todo o seu progresso? Isso não pode ser desfeito!')) {
+    if (confirm('Tem certeza que deseja apagar todo o seu progresso? Isso não pode ser desfeito!')) {
         localStorage.removeItem('smklicker_save');
         location.reload(); // Recarrega a página do zero
     }
@@ -278,7 +278,7 @@ function abrirModal(id) {
 function fecharModal(id) {
     document.getElementById(id).style.display = 'none';
 }
-window.onclick = function(event) {
+window.onclick = function (event) {
     if (event.target.classList.contains('modal')) {
         event.target.style.display = 'none';
     }
@@ -304,7 +304,7 @@ function mudarMultiplicador(valor) {
     multiplicadorCompra = valor;
     document.querySelectorAll('.buy-btn').forEach(btn => btn.classList.remove('active'));
     document.getElementById(`btn-buy-${valor}`).classList.add('active');
-    atualizarTela(); 
+    atualizarTela();
 }
 
 function getCustoAcumulado(est, qtdDesejada) {
@@ -335,7 +335,7 @@ function getMaxCompra(est, maxDesejado) {
 function clicarBorboleta() {
     smkoins += (1 * multiplicadorClique);
     cliquesTotais++;
-    verificarDesbloqueios(); 
+    verificarDesbloqueios();
     atualizarTela();
     checarConquistas();
 }
@@ -343,19 +343,19 @@ function clicarBorboleta() {
 function comprarEstrutura(index) {
     const est = estruturas[index];
     let qtdParaComprar = getMaxCompra(est, multiplicadorCompra);
-    
+
     // Se o jogador não tiver dinheiro pra comprar nem 1 unidade, ignora o clique
-    if (qtdParaComprar === 0) return; 
+    if (qtdParaComprar === 0) return;
 
     const custoTotal = getCustoAcumulado(est, qtdParaComprar);
 
     smkoins -= custoTotal;
     est.qtd += qtdParaComprar;
     estruturasCompradasTotais += qtdParaComprar;
-    
+
     calcularSPS();
-    verificarDesbloqueios(); 
-    renderizarEstruturas(); 
+    verificarDesbloqueios();
+    renderizarEstruturas();
     atualizarTela();
     checarConquistas();
     showStructureTooltip(index);
@@ -363,7 +363,7 @@ function comprarEstrutura(index) {
 
 function comprarUpgrade(index) {
     const upg = upgrades[index];
-    
+
     if (smkoins >= upg.custo && !upg.comprado) {
         smkoins -= upg.custo;
         upg.comprado = true;
@@ -375,10 +375,10 @@ function comprarUpgrade(index) {
             if (est) est.mult *= 2;
         }
 
-        hideTooltip(); 
+        hideTooltip();
         calcularSPS();
-        verificarDesbloqueios(); 
-        renderizarUpgrades(); 
+        verificarDesbloqueios();
+        renderizarUpgrades();
         atualizarTela();
     }
 }
@@ -400,14 +400,14 @@ function checarConquistas() {
             teveNova = true;
         }
     });
-    if(teveNova) renderizarConquistas();
+    if (teveNova) renderizarConquistas();
 }
 
 function verificarDesbloqueios() {
     let mudouAlgo = false;
     upgrades.forEach(upg => {
         if (!upg.comprado && !upg.visivel) {
-            if (upg.tipo === 'clique' && upg.requisitoCliques && cliquesTotais >= upg.requisitoCliques) { upg.visivel = true; mudouAlgo = true; } 
+            if (upg.tipo === 'clique' && upg.requisitoCliques && cliquesTotais >= upg.requisitoCliques) { upg.visivel = true; mudouAlgo = true; }
             else if (upg.tipo === 'estrutura' && upg.reqEstruturaQtd) {
                 const est = estruturas.find(e => e.id === upg.alvo);
                 if (est && est.qtd >= upg.reqEstruturaQtd) { upg.visivel = true; mudouAlgo = true; }
@@ -436,7 +436,7 @@ document.addEventListener('mousemove', (e) => {
     }
 });
 
-window.showStructureTooltip = function(index) {
+window.showStructureTooltip = function (index) {
     const est = estruturas[index];
     let producaoAtual = est.qtd * est.spsBase * est.mult * multiplicadorSPSGlobal;
     let porcentagem = sps > 0 ? ((producaoAtual / sps) * 100).toFixed(1) : 0;
@@ -453,13 +453,13 @@ window.showStructureTooltip = function(index) {
     tooltip.style.display = 'block';
 };
 
-window.showUpgradeTooltip = function(index) {
+window.showUpgradeTooltip = function (index) {
     const upg = upgrades[index];
     tooltip.innerHTML = `<h4>${upg.nome}</h4><p>${upg.desc}</p><p style="margin-top: 10px; color: var(--smk-pink); font-weight: bold;">Custo: ${formatarNumero(upg.custo)} SMK</p>`;
     tooltip.style.display = 'block';
 };
 
-window.showAchievementTooltip = function(index) {
+window.showAchievementTooltip = function (index) {
     const c = conquistas[index];
     if (c.atingido) {
         tooltip.innerHTML = `<h4>🏆 ${c.nome}</h4><p>${c.desc}</p>`;
@@ -469,7 +469,7 @@ window.showAchievementTooltip = function(index) {
     tooltip.style.display = 'block';
 };
 
-window.hideTooltip = function() { tooltip.style.display = 'none'; };
+window.hideTooltip = function () { tooltip.style.display = 'none'; };
 
 // ================= Renderizações =================
 function atualizarTela() {
@@ -479,7 +479,7 @@ function atualizarTela() {
     // --- SUBSTITUA DESTE PONTO ---
     estruturas.forEach((est, i) => {
         const div = document.getElementById(`est-${i}`);
-        if (div) { 
+        if (div) {
             let qtdPossivel = getMaxCompra(est, multiplicadorCompra);
             let podeComprar = qtdPossivel > 0;
 
@@ -500,7 +500,7 @@ function atualizarTela() {
                 if (podeComprar) {
                     // Mostra quanto vai comprar e deixa branco pra destacar
                     spanHover.innerText = `(+${qtdPossivel})`;
-                    spanHover.style.color = '#fff'; 
+                    spanHover.style.color = '#fff';
                     pPreco.innerText = `💰 ${formatarNumero(getCustoAcumulado(est, qtdPossivel))} SMK`;
                 } else {
                     // Se não tiver dinheiro, mostra +1 na cor cinza e o valor do próximo
@@ -525,7 +525,7 @@ function atualizarTela() {
 
 function renderizarEstruturas() {
     const container = document.getElementById('estruturas-container');
-    container.innerHTML = ''; 
+    container.innerHTML = '';
     estruturas.forEach((est, i) => {
         const revelado = i === 0 || estruturas[i - 1].qtd > 0;
         if (revelado) {
@@ -545,7 +545,7 @@ function renderizarEstruturas() {
             container.innerHTML += `<div class="estrutura-misterio">???</div>`;
         }
     });
-    
+
     // Injeta os valores corretos após criar o HTML
     atualizarTela();
 }
@@ -560,7 +560,7 @@ function renderizarUpgrades() {
         if (!upg.comprado && upg.visivel) {
             // Se o icone for url('...'), aplica como background. Se for Emoji, vai como texto.
             let styleBg = upg.icone.startsWith('url') ? `background-image: ${upg.icone}; color: transparent;` : '';
-            
+
             const html = `
                 <div id="upg-${i}" class="square-icon disabled" style="${styleBg}"
                      onclick="comprarUpgrade(${i})" onmouseenter="showUpgradeTooltip(${i})" onmouseleave="hideTooltip()">
@@ -580,7 +580,7 @@ function renderizarConquistas() {
     conquistas.forEach((conq, i) => {
         let containerId = `conq-${conq.tipo === 'clique' ? 'cliques' : conq.tipo === 'sps' ? 'sps' : 'estruturas'}`;
         let div = document.getElementById(containerId);
-        
+
         let classe = conq.atingido ? 'conq-unlocked' : 'conq-locked disabled';
         let iconeVisivel = conq.atingido ? conq.icone : '❓';
         let styleBg = (conq.atingido && conq.icone.startsWith('url')) ? `background-image: ${conq.icone}; color: transparent;` : '';
@@ -602,7 +602,7 @@ setInterval(() => {
     atualizarTela();
     // A cada tick não checaremos as conquistas para poupar processamento, 
     // mas de vez em quando é bom checar se tem SPS passivo batendo meta.
-    if(Math.random() < 0.05) checarConquistas(); 
+    if (Math.random() < 0.05) checarConquistas();
 }, 100);
 
 renderizarEstruturas();
