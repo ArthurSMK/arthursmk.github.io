@@ -1,5 +1,5 @@
 // ================= Variáveis Globais =================
-let smkoins = 1e33;
+let smkoins = 0;
 let sps = 0;
 let cliquesTotais = 0;
 let estruturasCompradasTotais = 0;
