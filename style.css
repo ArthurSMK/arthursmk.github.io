@@ -9,7 +9,6 @@
     
     /* A cor da sua marca no modo claro (Rosa) */
     --brand-color: #fd0041; 
-    
     --caca-erro: #fd0041;
     --tabuleiro: #cba6f7;
     --smklicker: #fd0041;
@@ -28,8 +27,9 @@
     /* A cor da sua marca no modo escuro (Branco) */
     --brand-color: #ffffff;
 
-    --caca-erro: #8a3c3c;
-    --tabuleiro: #3f6e30;
+    --caca-erro: #fd0041;
+    --tabuleiro: #cba6f7;
+    --smklicker: #fd0041;
     --em-breve: #333333;
 }
 
