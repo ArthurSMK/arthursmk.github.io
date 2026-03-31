@@ -3,11 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    
     <title>Caça-Erro</title>
     
     <link rel="icon" type="image/png" href="Icon.png">
-    
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -23,12 +21,11 @@
     <div id="chat-bubbles-container" class="chat-bubbles-container"></div>
 
     <div id="tela-menu" class="tela ativa">
-        
-        <img src="Icon.png" alt="Logo Caça-Erro" class="logo-principal">
-        
+        <img src="Logo.png" alt="Logo Caça-Erro" class="logo-principal">
         <h1>Caça-Erro</h1>
         
-        <button onclick="mudarTela('tela-config')">🎮 Jogar</button>
+        <button onclick="mudarTela('tela-selecao-modo')">🎮 Jogar</button>
+        
         <button onclick="mudarTela('tela-opcoes')">⚙️ Opções</button>
         <div class="redes-sociais">
             <a href="https://www.twitch.tv/arthursmk" target="_blank" rel="noopener noreferrer" class="icon-box"><i class="fa-brands fa-twitch"></i></a>
@@ -37,8 +34,18 @@
         </div>
     </div>
 
+    <div id="tela-selecao-modo" class="tela">
+        <h2>Escolha a Experiência</h2>
+        <button onclick="mudarTela('tela-config-single')">👤 Singleplayer (Jogar Sozinho)</button>
+        <button onclick="mudarTela('tela-config')">🔴 Modo Live (Integração Twitch)</button>
+        <button class="btn-voltar" onclick="mudarTela('tela-menu')">⬅️ Voltar ao Menu</button>
+    </div>
+
     <div id="tela-config" class="tela">
-        <h2>Configurar Partida</h2>
+        <h2>Configuração da Live</h2>
+        
+        <label for="twitch-channel">Canal da Twitch:</label>
+        <input type="text" id="twitch-channel" placeholder="Ex: arthursmk" value="arthursmk">
         
         <label for="modo-jogo">Modo de Jogo:</label>
         <select id="modo-jogo">
@@ -48,11 +55,11 @@
         </select>
 
         <label for="qtd-rodadas">Quantidade de Perguntas Normais:</label>
-        <input type="number" id="qtd-rodadas" value="4" min="1" max="50" oninput="atualizarContagem()">
+        <input type="number" id="qtd-rodadas" value="4" min="1" max="50" oninput="atualizarContagem('live')">
         
         <div class="caixa-bonus">
             <label for="intervalo-bonus" style="color: #ffcc00; margin-bottom: 10px;">🌟 Frequência das Rodadas Bônus:</label>
-            <select id="intervalo-bonus" onchange="atualizarContagem()" style="margin-bottom: 0;">
+            <select id="intervalo-bonus" onchange="atualizarContagem('live')" style="margin-bottom: 0;">
                 <option value="0">Desativado (Sem Bônus)</option>
                 <option value="1">A cada 1 pergunta normal (1 por 1)</option>
                 <option value="2">A cada 2 perguntas normais</option>
@@ -63,8 +70,34 @@
 
         <div id="aviso-total">Calculando...</div>
 
-        <button onclick="iniciarJogo()">🚀 Iniciar Partida</button>
-        <button class="btn-voltar" onclick="mudarTela('tela-menu')">⬅️ Voltar ao Menu</button>
+        <button onclick="iniciarJogoLive()">🚀 Iniciar Partida Live</button>
+        <button class="btn-voltar" onclick="mudarTela('tela-selecao-modo')">⬅️ Voltar</button>
+    </div>
+
+    <div id="tela-config-single" class="tela">
+        <h2>Configuração Singleplayer</h2>
+        
+        <label for="nome-jogador">Nome do Jogador:</label>
+        <input type="text" id="nome-jogador" placeholder="Digite seu nome..." value="Jogador 1">
+
+        <label for="qtd-rodadas-single">Quantidade de Perguntas Normais:</label>
+        <input type="number" id="qtd-rodadas-single" value="4" min="1" max="50" oninput="atualizarContagem('single')">
+        
+        <div class="caixa-bonus">
+            <label for="intervalo-bonus-single" style="color: #ffcc00; margin-bottom: 10px;">🌟 Frequência das Rodadas Bônus:</label>
+            <select id="intervalo-bonus-single" onchange="atualizarContagem('single')" style="margin-bottom: 0;">
+                <option value="0">Desativado (Sem Bônus)</option>
+                <option value="1">A cada 1 pergunta normal (1 por 1)</option>
+                <option value="2">A cada 2 perguntas normais</option>
+                <option value="3">A cada 3 perguntas normais</option>
+                <option value="4">A cada 4 perguntas normais</option>
+            </select>
+        </div>
+
+        <div id="aviso-total-single">Calculando...</div>
+
+        <button onclick="iniciarJogoSingle()">🚀 Iniciar Singleplayer</button>
+        <button class="btn-voltar" onclick="mudarTela('tela-selecao-modo')">⬅️ Voltar</button>
     </div>
 
     <div id="tela-opcoes" class="tela">
@@ -92,22 +125,22 @@
         </div>
         
         <div class="alternativas-container">
-            <div class="alternativa-card" id="linha-a" style="display: none;">
+            <div class="alternativa-card" id="linha-a" style="display: none;" onclick="votarSingleplayer('A')">
                 <span class="alt-letra">!A</span>
                 <span class="alt-texto" id="texto-a"></span>
                 <div class="votos-badge"><span id="votos-a">0</span> <i class="fa-solid fa-users"></i></div>
             </div>
-            <div class="alternativa-card" id="linha-b" style="display: none;">
+            <div class="alternativa-card" id="linha-b" style="display: none;" onclick="votarSingleplayer('B')">
                 <span class="alt-letra">!B</span>
                 <span class="alt-texto" id="texto-b"></span>
                 <div class="votos-badge"><span id="votos-b">0</span> <i class="fa-solid fa-users"></i></div>
             </div>
-            <div class="alternativa-card" id="linha-c" style="display: none;">
+            <div class="alternativa-card" id="linha-c" style="display: none;" onclick="votarSingleplayer('C')">
                 <span class="alt-letra">!C</span>
                 <span class="alt-texto" id="texto-c"></span>
                 <div class="votos-badge"><span id="votos-c">0</span> <i class="fa-solid fa-users"></i></div>
             </div>
-            <div class="alternativa-card" id="linha-d" style="display: none;">
+            <div class="alternativa-card" id="linha-d" style="display: none;" onclick="votarSingleplayer('D')">
                 <span class="alt-letra">!D</span>
                 <span class="alt-texto" id="texto-d"></span>
                 <div class="votos-badge"><span id="votos-d">0</span> <i class="fa-solid fa-users"></i></div>

@@ -13,18 +13,12 @@
 
 body {
     background-color: var(--bg-color); color: var(--text-color);
-    
-    /* APLICAÇÃO DA FONTE ANTA */
-    font-family: "Anta", sans-serif; 
-    font-weight: 400;
-    
+    font-family: "Anta", sans-serif; font-weight: 400;
     margin: 0; display: flex; justify-content: center; align-items: center;
     height: 100vh; transition: background-color 0.3s, color 0.3s; overflow: hidden; 
 }
 
-button, select, input {
-    font-family: "Anta", sans-serif;
-}
+button, select, input { font-family: "Anta", sans-serif; }
 
 .tela {
     display: none; flex-direction: column; align-items: center;
@@ -35,25 +29,13 @@ button, select, input {
 
 .tela.ativa { display: flex; }
 
-/* ======== ESTILIZAÇÃO DA LOGO PRINCIPAL ======== */
 .logo-principal {
-    max-width: 250px;
-    height: auto;
-    margin-bottom: 20px;
-    display: block;
-    
-    /* OPCIONAL: Adiciona um brilho leve atrás para destacar mais */
-    drop-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
+    max-width: 250px; height: auto; margin-bottom: 20px; display: block; drop-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
 }
 
-/* ======== TÍTULO H1 GLOBAL (Branco) ======== */
 h1 { margin-top: 0; font-size: 32px; margin-bottom: 30px; color: var(--text-color); }
 h2 { margin-top: 0; color: var(--primary-color); }
-
-/* ======== CORREÇÃO: Título H1 do Menu Principal (Vermelho) ======== */
-#tela-menu h1 {
-    color: var(--primary-color);
-}
+#tela-menu h1 { color: var(--primary-color); }
 
 button {
     background-color: var(--primary-color); color: white; border: none;
@@ -68,7 +50,7 @@ button:hover { background-color: var(--hover-color); transform: scale(1.02); }
 
 label { display: block; text-align: left; margin-bottom: 5px; font-weight: bold; width: 100%; color: var(--text-color); }
 
-select, input[type="number"] {
+select, input[type="number"], input[type="text"] {
     width: 100%; padding: 12px 15px; margin-bottom: 20px;
     border-radius: 8px; border: 2px solid var(--primary-color);
     background-color: var(--caixa-bg); color: var(--text-color);
@@ -83,12 +65,12 @@ select {
     padding-right: 40px;
 }
 select option { background-color: var(--bg-color); color: var(--text-color); font-weight: bold; }
-select:focus, input[type="number"]:focus { border-color: var(--sucesso); box-shadow: 0 0 10px rgba(0, 255, 170, 0.4); }
+select:focus, input[type="number"]:focus, input[type="text"]:focus { border-color: var(--sucesso); box-shadow: 0 0 10px rgba(0, 255, 170, 0.4); }
 
 .opcao-toggle { display: flex; justify-content: space-between; align-items: center; width: 100%; margin-bottom: 20px; font-size: 18px; font-weight: bold; }
 .caixa-bonus { background: rgba(255, 204, 0, 0.1); border: 1px solid #ffcc00; padding: 15px; border-radius: 8px; margin-bottom: 10px; width: 100%; box-sizing: border-box; }
 
-#aviso-total {
+#aviso-total, #aviso-total-single {
     font-size: 18px; color: var(--sucesso); font-weight: bold; margin-bottom: 20px;
     background-color: rgba(0, 255, 170, 0.1); padding: 10px; border-radius: 8px; width: 100%; box-sizing: border-box;
 }
@@ -107,8 +89,14 @@ select:focus, input[type="number"]:focus { border-color: var(--sucesso); box-sha
 
 .alternativa-card {
     background: rgba(255, 255, 255, 0.05); border: 2px solid var(--border-color); border-radius: 8px;
-    padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; transition: all 0.5s ease;
+    padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; transition: all 0.3s ease;
 }
+
+/* CLASSES DINÂMICAS PARA SINGLEPLAYER */
+.alternativa-card.clicavel { cursor: pointer; }
+.alternativa-card.clicavel:hover { border-color: var(--primary-color); transform: scale(1.02); background: rgba(255, 255, 255, 0.1); }
+.alternativa-card.selecionada { border-color: #ffcc00 !important; box-shadow: 0 0 15px rgba(255, 204, 0, 0.4) !important; background: rgba(255, 204, 0, 0.15) !important; }
+
 .alt-letra { font-weight: bold; color: var(--primary-color); font-size: 22px; margin-right: 10px; }
 .alt-texto { font-size: 20px; text-align: left; flex-grow: 1; }
 
@@ -117,7 +105,7 @@ select:focus, input[type="number"]:focus { border-color: var(--sucesso); box-sha
     border-radius: 20px; font-size: 18px; font-weight: bold; color: var(--sucesso); min-width: 60px; text-align: center;
 }
 
-.alternativa-card.resposta-certa { background: rgba(0, 255, 170, 0.2); border-color: var(--sucesso); transform: scale(1.05); box-shadow: 0 0 20px rgba(0, 255, 170, 0.4); z-index: 10; }
+.alternativa-card.resposta-certa { background: rgba(0, 255, 170, 0.2) !important; border-color: var(--sucesso) !important; transform: scale(1.05) !important; box-shadow: 0 0 20px rgba(0, 255, 170, 0.4) !important; z-index: 10; }
 .alternativa-card.resposta-certa .alt-letra { color: var(--sucesso); }
 .alternativa-card.resposta-certa .votos-badge { background: var(--sucesso); color: #121212; border-color: var(--sucesso); }
 .alternativa-card.resposta-errada { background: rgba(253, 0, 65, 0.1); border-color: var(--primary-color); opacity: 0.5; transform: scale(0.98); }

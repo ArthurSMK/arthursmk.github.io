@@ -7,68 +7,43 @@ let statusGlobais = ["Vida", "Dinheiro"];
 let itensCriados = []; 
 let regrasAtivas = ["Todos os jogadores começam na Loja."]; 
 let eventos = []; 
-let dadosCasas = { "Loja": { id: "Loja", conexoes: [], descricao: "Mercado e Ponto Inicial" } };
+let dadosCasas = { "Loja": { id: "Loja", conexoes: [], descricao: "Mercado e Ponto Inicial", cooldowns: [] } };
 
-// NOVO: Array Global para guardar os sorteios para sempre
 let sorteiosSalvos = [];
-
 let mapaNetwork = null; let nodesMap; let edgesMap;
-
 let canalTwitch = ""; let twitchClient = null; let aceitandoJoins = false; let mensagensNaoLidas = 0;
 
 window.onload = () => {
-    if(localStorage.getItem('rpgTwitchSave')) {
-        document.getElementById('btn-continuar-jogo').style.display = 'block';
-    }
-    // Carrega os Sorteios Salvos se existirem no navegador
-    if(localStorage.getItem('rpgTwitchMacros')) {
-        sorteiosSalvos = JSON.parse(localStorage.getItem('rpgTwitchMacros'));
-    }
+    if(localStorage.getItem('rpgTwitchSave')) { document.getElementById('btn-continuar-jogo').style.display = 'block'; }
+    if(localStorage.getItem('rpgTwitchMacros')) { sorteiosSalvos = JSON.parse(localStorage.getItem('rpgTwitchMacros')); }
 };
 
 function salvarJogo() {
     if(!nodesMap) return;
     const pos = mapaNetwork.getPositions();
-    const nodesArr = nodesMap.get().map(n => {
-        if(pos[n.id]) { n.x = pos[n.id].x; n.y = pos[n.id].y; }
-        return n;
-    });
-    
-    const saveObj = {
-        configPartida, jogadores, turnoAtualIndex, statusGlobais,
-        itensCriados, regrasAtivas, dadosCasas, rodadaGlobal, eventos,
-        nodes: nodesArr, edges: edgesMap.get()
-    };
+    const nodesArr = nodesMap.get().map(n => { if(pos[n.id]) { n.x = pos[n.id].x; n.y = pos[n.id].y; } return n; });
+    const saveObj = { configPartida, jogadores, turnoAtualIndex, statusGlobais, itensCriados, regrasAtivas, dadosCasas, rodadaGlobal, eventos, nodes: nodesArr, edges: edgesMap.get() };
     localStorage.setItem('rpgTwitchSave', JSON.stringify(saveObj));
 }
 
 function carregarJogo() {
-    const save = localStorage.getItem('rpgTwitchSave');
-    if(!save) return;
-    
+    const save = localStorage.getItem('rpgTwitchSave'); if(!save) return;
     const data = JSON.parse(save);
-    configPartida = data.configPartida; jogadores = data.jogadores;
-    turnoAtualIndex = data.turnoAtualIndex; statusGlobais = data.statusGlobais;
-    itensCriados = data.itensCriados; regrasAtivas = data.regrasAtivas;
-    dadosCasas = data.dadosCasas; rodadaGlobal = data.rodadaGlobal || 1;
-    eventos = data.eventos || [];
+    configPartida = data.configPartida; jogadores = data.jogadores; turnoAtualIndex = data.turnoAtualIndex; statusGlobais = data.statusGlobais;
+    itensCriados = data.itensCriados; regrasAtivas = data.regrasAtivas; dadosCasas = data.dadosCasas; rodadaGlobal = data.rodadaGlobal || 1; eventos = data.eventos || [];
+    
+    // Garante que o array de cooldowns exista em casas antigas carregadas
+    Object.keys(dadosCasas).forEach(k => { if(!dadosCasas[k].cooldowns) dadosCasas[k].cooldowns = []; });
 
     mudarTela('container-jogo');
-    
-    nodesMap = new vis.DataSet(data.nodes);
-    edgesMap = new vis.DataSet(data.edges);
+    nodesMap = new vis.DataSet(data.nodes); edgesMap = new vis.DataSet(data.edges);
     const container = document.getElementById('tabuleiro-visual');
-    const options = {
-        nodes: { borderWidth: 2, shadow: true, shape: 'box', widthConstraint: { maximum: 220 } },
-        edges: { width: 3, color: '#cdd6f4', length: 150, smooth: false },
-        physics: { enabled: true, barnesHut: { gravitationalConstant: -2000, springConstant: 0.04, springLength: 150 } }
-    };
+    const options = { nodes: { borderWidth: 2, shadow: true, shape: 'box', widthConstraint: { maximum: 220 } }, edges: { width: 3, color: '#cdd6f4', length: 150, smooth: false }, physics: { enabled: true, barnesHut: { gravitationalConstant: -2000, springConstant: 0.04, springLength: 150 } } };
     mapaNetwork = new vis.Network(container, { nodes: nodesMap, edges: edgesMap }, options);
     mapaNetwork.on("dragStart", function (params) { if (params.nodes.length > 0) { nodesMap.update({id: params.nodes[0], fixed: false}); } });
     mapaNetwork.on("dragEnd", function (params) { if (params.nodes.length > 0) { nodesMap.update({id: params.nodes[0], fixed: {x:true, y:true}}); salvarJogo(); } });
 
-    atualizarTudo();
-    focarNaCasa(jogadores[turnoAtualIndex].local);
+    atualizarTudo(); focarNaCasa(jogadores[turnoAtualIndex].local);
 }
 
 let resolveAlerta, resolveConfirmacao, resolvePrompt;
@@ -79,15 +54,6 @@ function fecharConfirmacao(resultado) { document.getElementById('modal-confirmac
 function mostrarPrompt(titulo, valorPadrao = '') { document.getElementById('prompt-titulo').innerText = titulo; document.getElementById('prompt-input').value = valorPadrao; document.getElementById('modal-prompt').style.display = 'flex'; document.getElementById('prompt-input').focus(); return new Promise(resolve => resolvePrompt = resolve); }
 function fecharPrompt(resultado) { document.getElementById('modal-prompt').style.display = 'none'; if(resolvePrompt) resolvePrompt(resultado); }
 
-function btnSucesso(btnId) {
-    const btn = document.getElementById(btnId);
-    if(!btn) return;
-    const txtOrig = btn.innerText;
-    btn.innerText = "✅ Salvo!";
-    btn.style.backgroundColor = "var(--success)";
-    setTimeout(() => { btn.innerText = txtOrig; btn.style.backgroundColor = "var(--primary)"; }, 1200);
-}
-
 function mudarTela(idTela) { document.querySelectorAll('.tela').forEach(t => t.classList.remove('ativa')); document.getElementById('container-jogo').style.display = 'none'; if (idTela === 'container-jogo') { document.getElementById('container-jogo').style.display = 'flex'; } else { document.getElementById(idTela).classList.add('ativa'); } }
 
 function iniciarLobby() {
@@ -96,7 +62,7 @@ function iniciarLobby() {
     canalTwitch = canalInput.replace('https://www.twitch.tv/', '').replace('https://twitch.tv/', '').replace('@', '');
     
     jogadores = []; rodadaGlobal = 1; eventos = []; itensCriados = []; regrasAtivas = ["Todos os jogadores começam na Loja."];
-    dadosCasas = { "Loja": { id: "Loja", conexoes: [], descricao: "Mercado e Ponto Inicial" } };
+    dadosCasas = { "Loja": { id: "Loja", conexoes: [], descricao: "Mercado e Ponto Inicial", cooldowns: [] } };
     
     atualizarLobby(); mudarTela('tela-lobby'); aceitandoJoins = true;
     if(canalTwitch !== "") { conectarTwitchNativo(); } else { document.getElementById('status-twitch').innerText = "⚠️ Twitch não conectada. Use o botão Add manual."; document.getElementById('status-twitch').style.color = "var(--accent)"; }
@@ -173,13 +139,32 @@ function voltarAoMenu() {
     fecharModal('modal-vitoria'); localStorage.removeItem('rpgTwitchSave'); mudarTela('tela-menu'); window.location.reload();
 }
 
-function abrirModal(id) { 
-    document.getElementById(id).style.display = 'flex'; 
-    if(id === 'modal-editar') renderizarEditor();
-    if(id === 'modal-sorteio') renderizarSorteiosSalvos();
-}
+function abrirModal(id) { document.getElementById(id).style.display = 'flex'; if(id === 'modal-editar') renderizarEditor(); if(id === 'modal-sorteio') renderizarSorteiosSalvos(); }
 function fecharModal(id) { document.getElementById(id).style.display = 'none'; }
 function abrirModalChat() { abrirModal('modal-chat'); mensagensNaoLidas = 0; document.getElementById('notificacao-chat').style.display = 'none'; const chatBox = document.getElementById('chat-jogador-atual'); if(chatBox) chatBox.scrollTop = chatBox.scrollHeight; }
+
+// ==========================================
+// NOVO MODAL: COOLDOWN DAS CASAS
+// ==========================================
+function abrirModalCooldown() {
+    const selCasa = document.getElementById('cooldown-casa'); const selJog = document.getElementById('cooldown-jogador');
+    selCasa.innerHTML = ''; Object.keys(dadosCasas).forEach(casa => { selCasa.innerHTML += `<option value="${casa}">${casa}</option>`; });
+    selJog.innerHTML = '<option value="Todos">Todos os Jogadores</option>'; jogadores.forEach(j => { selJog.innerHTML += `<option value="${j.nome}">${j.nome}</option>`; });
+    abrirModal('modal-cooldown');
+}
+
+function aplicarCooldown() {
+    const casa = document.getElementById('cooldown-casa').value; const alvo = document.getElementById('cooldown-jogador').value; const turnos = parseInt(document.getElementById('cooldown-turnos').value);
+    if(!casa || isNaN(turnos) || turnos < 1) return;
+    if(!dadosCasas[casa].cooldowns) dadosCasas[casa].cooldowns = [];
+    
+    // Sobrescreve cooldown anterior se o mesmo alvo for escolhido
+    dadosCasas[casa].cooldowns = dadosCasas[casa].cooldowns.filter(c => c.alvo !== alvo);
+    dadosCasas[casa].cooldowns.push({ alvo: alvo, turnos: turnos });
+
+    fecharModal('modal-cooldown'); atualizarTudo();
+    mostrarAlerta(`🚫 A casa '${casa}' foi bloqueada para '${alvo}' por ${turnos} rodada(s)!`);
+}
 
 function limparChatDoTurno() {
     const chatBox = document.getElementById('chat-jogador-atual'); const chatSub = document.getElementById('chat-subtitulo');
@@ -204,7 +189,6 @@ function focarNaCasa(nodeId) { if(mapaNetwork) { mapaNetwork.focus(nodeId, { sca
 function atualizarTudo() {
     atualizarHUD(); atualizarTurnoUI(); atualizarMarcadoresNoMapa(); renderizarRegrasLive();
     document.getElementById('banner-turno').innerText = `RODADA ${rodadaGlobal} | Vez de: ${jogadores[turnoAtualIndex].nome}`;
-    
     salvarJogo(); 
 
     let vivos = jogadores.filter(j => !j.morto);
@@ -222,15 +206,25 @@ function passarTurno() {
         loopGuard++;
     } while (jogadores[turnoAtualIndex].morto && loopGuard <= jogadores.length);
     
-    limparChatDoTurno(); atualizarTudo(); focarNaCasa(jogadores[turnoAtualIndex].local);
+    limparChatDoTurno(); 
 
     if(rodadaVirou) {
         rodadaGlobal++; let msgs = [];
         eventos.forEach(e => { if(rodadaGlobal % e.frequencia === 0) msgs.push(`- ${e.mensagem}`); });
+        
+        // DECREMENTA COOLDOWNS DAS CASAS A CADA RODADA
+        for (let cNome in dadosCasas) {
+            if (dadosCasas[cNome].cooldowns) {
+                dadosCasas[cNome].cooldowns.forEach(c => c.turnos--);
+                dadosCasas[cNome].cooldowns = dadosCasas[cNome].cooldowns.filter(c => c.turnos > 0);
+            }
+        }
+
         if(msgs.length > 0) { mostrarAlerta(`⏰ ATENÇÃO! EVENTOS DA RODADA ${rodadaGlobal}:\n\n` + msgs.join('\n')); }
         document.getElementById('banner-turno').innerText = `RODADA ${rodadaGlobal} | Vez de: ${jogadores[turnoAtualIndex].nome}`;
-        salvarJogo();
     }
+
+    atualizarTudo(); focarNaCasa(jogadores[turnoAtualIndex].local);
 }
 
 async function matarJogador(index) { const sim = await mostrarConfirmacao(`Tem certeza que o jogador ${jogadores[index].nome} MORREU?`); if(sim) { jogadores[index].morto = true; atualizarTudo(); if(index === turnoAtualIndex) passarTurno(); } }
@@ -254,7 +248,26 @@ function atualizarTurnoUI() {
     const locaisConectados = dadosCasas[jogadorDaVez.local].conexoes;
     divOpcoes.innerHTML = '<p style="font-size: 0.85em; margin: 0 0 5px 0; font-weight: bold; color: #ccc;">Andar para:</p>';
     if (locaisConectados.length === 0) { divOpcoes.innerHTML += `<em>Nenhum caminho!</em>`; } 
-    else { locaisConectados.forEach(destino => { divOpcoes.innerHTML += `<button class="btn-padrao" style="background-color: #89b4fa; padding: 6px; margin: 2px 0;" onclick="moverJogador('${destino}')">Ir para: ${destino}</button>`; }); }
+    else { 
+        locaisConectados.forEach(destino => { 
+            // VERIFICA SE O CAMINHO ESTÁ BLOQUEADO POR COOLDOWN
+            let bloqueado = false;
+            let msgBloqueio = "";
+            if (dadosCasas[destino] && dadosCasas[destino].cooldowns) {
+                for (let c of dadosCasas[destino].cooldowns) {
+                    if (c.alvo === "Todos" || c.alvo === jogadorDaVez.nome) {
+                        bloqueado = true; msgBloqueio = `Bloqueado (${c.turnos} rod)`; break;
+                    }
+                }
+            }
+
+            if (bloqueado) {
+                divOpcoes.innerHTML += `<button class="btn-padrao" style="background-color: #555; color: #888; cursor: not-allowed; padding: 6px; margin: 2px 0;" disabled>🔒 ${destino} [${msgBloqueio}]</button>`;
+            } else {
+                divOpcoes.innerHTML += `<button class="btn-padrao" style="background-color: #89b4fa; padding: 6px; margin: 2px 0;" onclick="moverJogador('${destino}')">Ir para: ${destino}</button>`; 
+            }
+        }); 
+    }
 }
 
 async function comprarItemDaLoja(itemIndex) {
@@ -289,48 +302,24 @@ function darItem(jogadorIndex) {
     }
 }
 
-// ==========================================
-// MESA DE DADOS COM MACROS ETERNOS
-// ==========================================
+// MACROS ETERNOS
 function salvarSorteioAtual() {
     const input = document.getElementById('input-sorteio-custom').value.trim();
     if(!input) { mostrarAlerta("Digite algo na caixa de texto para salvar!"); return; }
     if(!sorteiosSalvos.includes(input)) {
-        sorteiosSalvos.push(input);
-        localStorage.setItem('rpgTwitchMacros', JSON.stringify(sorteiosSalvos));
-        renderizarSorteiosSalvos();
-    } else {
-        mostrarAlerta("Este sorteio já está salvo na lista.");
-    }
+        sorteiosSalvos.push(input); localStorage.setItem('rpgTwitchMacros', JSON.stringify(sorteiosSalvos)); renderizarSorteiosSalvos();
+    } else { mostrarAlerta("Este sorteio já está salvo na lista."); }
 }
 
 function renderizarSorteiosSalvos() {
-    const container = document.getElementById('lista-sorteios-salvos');
-    if(!container) return;
-    container.innerHTML = '';
-    if(sorteiosSalvos.length === 0) {
-        container.innerHTML = '<em style="color: #666; font-size: 0.85em;">Nenhum sorteio salvo.</em>';
-        return;
-    }
+    const container = document.getElementById('lista-sorteios-salvos'); if(!container) return; container.innerHTML = '';
+    if(sorteiosSalvos.length === 0) { container.innerHTML = '<em style="color: #666; font-size: 0.85em;">Nenhum sorteio salvo.</em>'; return; }
     sorteiosSalvos.forEach((s, i) => {
-        container.innerHTML += `
-        <div style="display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.4); padding: 5px 10px; border-radius: 6px; border: 1px solid #444; gap: 10px;">
-            <button class="btn-padrao" style="flex: 1; margin: 0; padding: 5px; font-size: 0.9em; text-align: left; background: transparent; color: var(--text); border: none; cursor: pointer; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" onclick="rodarSorteioSalvo(${i})">▶️ ${s}</button>
-            <button class="btn-padrao" style="background-color: var(--accent); color: #111; margin: 0; padding: 5px 10px; width: auto;" onclick="excluirSorteioSalvo(${i})">🗑️</button>
-        </div>`;
+        container.innerHTML += `<div style="display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.4); padding: 5px 10px; border-radius: 6px; border: 1px solid #444; gap: 10px;"><button class="btn-padrao" style="flex: 1; margin: 0; padding: 5px; font-size: 0.9em; text-align: left; background: transparent; color: var(--text); border: none; cursor: pointer; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" onclick="rodarSorteioSalvo(${i})">▶️ ${s}</button><button class="btn-padrao" style="background-color: var(--accent); color: #111; margin: 0; padding: 5px 10px; width: auto;" onclick="excluirSorteioSalvo(${i})">🗑️</button></div>`;
     });
 }
-
-function rodarSorteioSalvo(index) {
-    document.getElementById('input-sorteio-custom').value = sorteiosSalvos[index];
-    sortear('custom');
-}
-
-function excluirSorteioSalvo(index) {
-    sorteiosSalvos.splice(index, 1);
-    localStorage.setItem('rpgTwitchMacros', JSON.stringify(sorteiosSalvos));
-    renderizarSorteiosSalvos();
-}
+function rodarSorteioSalvo(index) { document.getElementById('input-sorteio-custom').value = sorteiosSalvos[index]; sortear('custom'); }
+function excluirSorteioSalvo(index) { sorteiosSalvos.splice(index, 1); localStorage.setItem('rpgTwitchMacros', JSON.stringify(sorteiosSalvos)); renderizarSorteiosSalvos(); }
 
 function animarRoleta(opcoesArray, emojiBase) {
     if(!opcoesArray || opcoesArray.length === 0) return;
@@ -361,34 +350,89 @@ function sortear(tipo) {
     }
 }
 
-// ---------------------------
-function criarNovoStatus() { const nome = document.getElementById('novo-status-nome').value.trim(); const valorInicial = parseInt(document.getElementById('novo-status-valor').value) || 0; if (!nome || statusGlobais.includes(nome)) { mostrarAlerta("Preencha o nome do status."); return; } statusGlobais.push(nome); jogadores.forEach(j => { j.stats[nome] = valorInicial; }); btnSucesso('btn-add-status'); atualizarTudo(); }
-function criarRegra() { const i = document.getElementById('regra-texto'); if(i.value.trim() === '') { mostrarAlerta("A regra não pode ser vazia."); return; } regrasAtivas.push(i.value.trim()); btnSucesso('btn-add-regra'); atualizarTudo(); }
+// FUNÇÕES DE CRIAÇÃO QUE AGORA LIMPAM OS INPUTS APÓS O SUCESSO!
+function criarNovoStatus() { 
+    const nome = document.getElementById('novo-status-nome').value.trim(); const valorInicial = parseInt(document.getElementById('novo-status-valor').value) || 0; 
+    if (!nome || statusGlobais.includes(nome)) { mostrarAlerta("Preencha o nome do status."); return; }
+    statusGlobais.push(nome); jogadores.forEach(j => { j.stats[nome] = valorInicial; }); 
+    
+    document.getElementById('novo-status-nome').value = ''; document.getElementById('novo-status-valor').value = ''; // LIMPA
+    fecharModal('modal-criar'); atualizarTudo(); 
+}
+
+function criarRegra() { 
+    const i = document.getElementById('regra-texto'); if(i.value.trim() === '') { mostrarAlerta("A regra não pode ser vazia."); return; }
+    regrasAtivas.push(i.value.trim()); 
+    
+    i.value = ''; // LIMPA
+    fecharModal('modal-criar'); atualizarTudo(); 
+}
+
 function renderizarRegrasLive() { const lista = document.getElementById('regras-lista'); lista.innerHTML = ''; regrasAtivas.forEach((r, index) => { lista.innerHTML += `<div class="regra-card"><strong>Regra ${index + 1}:</strong>${r}</div>`; }); }
-function criarItem() { const n = document.getElementById('item-nome').value.trim(); const e = document.getElementById('item-efeito').value.trim(); let pStr = document.getElementById('item-preco').value.trim(); if(!n) { mostrarAlerta("Dê um nome para o item!"); return; } let precoF = pStr === '' ? 0 : parseInt(pStr); itensCriados.push({ nome: n, efeito: e || "Nenhum", preco: precoF }); btnSucesso('btn-add-item'); atualizarTudo(); }
+
+function criarItem() { 
+    const n = document.getElementById('item-nome').value.trim(); const e = document.getElementById('item-efeito').value.trim(); 
+    let pStr = document.getElementById('item-preco').value.trim();
+    if(!n) { mostrarAlerta("Dê um nome para o item!"); return; }
+    let precoF = pStr === '' ? 0 : parseInt(pStr);
+    itensCriados.push({ nome: n, efeito: e || "Nenhum", preco: precoF }); 
+    
+    document.getElementById('item-nome').value = ''; document.getElementById('item-efeito').value = ''; document.getElementById('item-preco').value = ''; // LIMPA
+    fecharModal('modal-criar'); atualizarTudo(); 
+}
+
 function criarCasa() {
     const nome = document.getElementById('casa-nome').value.trim(); const descricao = document.getElementById('casa-efeito-master').value.trim();
     if(!nome) { mostrarAlerta("Dê um nome para a casa!"); return; } if(dadosCasas[nome]) { mostrarAlerta("Esta casa já existe!"); return; }
     const con1 = document.getElementById('casa-conexao1').value; const con2 = document.getElementById('casa-conexao2').value;
-    dadosCasas[nome] = { id: nome, conexoes: [], descricao: descricao || "Sem descrição" };
+
+    dadosCasas[nome] = { id: nome, conexoes: [], descricao: descricao || "Sem descrição", cooldowns: [] };
     nodesMap.add({ id: nome, label: `${nome}\n(${dadosCasas[nome].descricao})\n\n[ Vazia ]`, shape: 'box', color: '#cba6f7', font: { color: "#111", size: 14 }, margin: 10 });
     if(con1) { edgesMap.add({ from: con1, to: nome }); dadosCasas[nome].conexoes.push(con1); dadosCasas[con1].conexoes.push(nome); }
     if(con2 && con2 !== con1) { edgesMap.add({ from: con2, to: nome }); dadosCasas[nome].conexoes.push(con2); dadosCasas[con2].conexoes.push(nome); }
-    atualizarSelectsDeCasas(); btnSucesso('btn-add-casa'); atualizarTudo();
+
+    atualizarSelectsDeCasas(); 
+    
+    document.getElementById('casa-nome').value = ''; document.getElementById('casa-efeito-master').value = ''; document.getElementById('casa-conexao2').value = ''; // LIMPA
+    fecharModal('modal-criar'); atualizarTudo();
 }
-function criarEvento() { const msg = document.getElementById('evento-msg').value.trim(); const turnos = parseInt(document.getElementById('evento-turnos').value); if(!msg || !turnos) { mostrarAlerta("Preencha a mensagem e as rodadas."); return; } eventos.push({ mensagem: msg, frequencia: turnos }); btnSucesso('btn-add-evento'); atualizarTudo(); }
-function atualizarSelectsDeCasas() { const sel1 = document.getElementById('casa-conexao1'); const sel2 = document.getElementById('casa-conexao2'); sel1.innerHTML = ''; sel2.innerHTML = '<option value="">Conexão 2 (Opcional)</option>'; Object.keys(dadosCasas).forEach(nomeCasa => { sel1.innerHTML += `<option value="${nomeCasa}">Ligar à: ${nomeCasa}</option>`; sel2.innerHTML += `<option value="${nomeCasa}">Ligar à: ${nomeCasa}</option>`; }); }
+
+function criarEvento() {
+    const msg = document.getElementById('evento-msg').value.trim(); const turnos = parseInt(document.getElementById('evento-turnos').value);
+    if(!msg || !turnos) { mostrarAlerta("Preencha a mensagem e de quantas em quantas rodadas deve avisar."); return; }
+    eventos.push({ mensagem: msg, frequencia: turnos });
+    
+    document.getElementById('evento-msg').value = ''; document.getElementById('evento-turnos').value = ''; // LIMPA
+    fecharModal('modal-criar'); atualizarTudo();
+}
+
+function atualizarSelectsDeCasas() {
+    const sel1 = document.getElementById('casa-conexao1'); const sel2 = document.getElementById('casa-conexao2');
+    sel1.innerHTML = ''; sel2.innerHTML = '<option value="">Conexão 2 (Opcional)</option>';
+    Object.keys(dadosCasas).forEach(nomeCasa => { sel1.innerHTML += `<option value="${nomeCasa}">Ligar à: ${nomeCasa}</option>`; sel2.innerHTML += `<option value="${nomeCasa}">Ligar à: ${nomeCasa}</option>`; });
+}
+
 function atualizarMarcadoresNoMapa() {
     const atualizacoes = [];
     for (let nomeCasa in dadosCasas) {
-        let labelLive = `${nomeCasa}`; if (dadosCasas[nomeCasa].descricao) { labelLive += `\n(${dadosCasas[nomeCasa].descricao})`; }
+        let labelLive = `${nomeCasa}`;
+        if (dadosCasas[nomeCasa].descricao) { labelLive += `\n(${dadosCasas[nomeCasa].descricao})`; }
+        
+        // ADICIONA CADEADO NO MAPA SE TIVER COOLDOWN
+        if(dadosCasas[nomeCasa].cooldowns && dadosCasas[nomeCasa].cooldowns.length > 0) {
+            let locks = dadosCasas[nomeCasa].cooldowns.map(c => `${c.alvo}: ${c.turnos}R`);
+            labelLive += `\n🔒 Bloqueio (${locks.join(', ')})`;
+        }
+
         let jogadoresAqui = jogadores.filter(j => j.local === nomeCasa && !j.morto).map(j => j.nome);
         if (jogadoresAqui.length > 0) { labelLive += `\n\n[ ${jogadoresAqui.join(' | ')} ]`; } else if (nomeCasa !== 'Loja') { labelLive += `\n\n[ Vazia ]`; }
         atualizacoes.push({ id: nomeCasa, label: labelLive });
     }
     nodesMap.update(atualizacoes);
 }
+
 function alterarStatus(index, atr, val) { if(jogadores[index].morto) return; jogadores[index].stats[atr] += val; atualizarHUD(); }
+
 function atualizarHUD() {
     const listaLive = document.getElementById('jogadores-lista-live'); const listaMaster = document.getElementById('controles-master-jogadores');
     if(!listaLive || !listaMaster) return; listaLive.innerHTML = ''; listaMaster.innerHTML = '';
@@ -401,13 +445,10 @@ function atualizarHUD() {
 
     jogadores.forEach((jog, index) => {
         const classeAtiva = (index === turnoAtualIndex && !jog.morto) ? 'jogador-ativo' : ''; const classeMorto = jog.morto ? 'jogador-morto' : ''; const classeMortoMaster = jog.morto ? 'morto-master' : '';
-        let htmlStatusLive = ''; for (let stat in jog.stats) { htmlStatusLive += `<span class="status-item">${stat}: ${jog.stats[stat]}</span>`; }
         
+        let htmlStatusLive = ''; for (let stat in jog.stats) { htmlStatusLive += `<span class="status-item">${stat}: ${jog.stats[stat]}</span>`; }
         let htmlInventario = '🎒 Itens: ';
-        if (jog.inventario.length > 0) {
-            htmlInventario += jog.inventario.map(it => { let nomeIt = it.nome || it; let efIt = it.efeito || 'Sem efeito.'; return `<span class="tooltip-item" data-efeito="${efIt}">${nomeIt}</span>`; }).join(', ');
-        } else { htmlInventario += 'Nenhum'; }
-
+        if (jog.inventario.length > 0) { htmlInventario += jog.inventario.map(it => { let nomeIt = it.nome || it; let efIt = it.efeito || 'Sem efeito.'; return `<span class="tooltip-item" data-efeito="${efIt}">${nomeIt}</span>`; }).join(', '); } else { htmlInventario += 'Nenhum'; }
         listaLive.innerHTML += `<div class="jogador-card ${classeAtiva} ${classeMorto}"><strong>${index + 1}. ${jog.nome}</strong> (Em: ${jog.local})<div class="status-bar">${htmlStatusLive}</div><div class="inventario-box">${htmlInventario}</div></div>`;
 
         let htmlStatusMaster = ''; for (let stat in jog.stats) { htmlStatusMaster += `<div class="status-control-box"><button class="btn-pequeno" onclick="alterarStatus(${index}, '${stat}', -1)">-</button><span>${stat}: ${jog.stats[stat]}</span><button class="btn-pequeno" onclick="alterarStatus(${index}, '${stat}', 1)">+</button></div>`; }

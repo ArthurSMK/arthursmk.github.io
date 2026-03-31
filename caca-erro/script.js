@@ -1,12 +1,13 @@
 // ARQUIVO: script.js
 
-// --- CÁLCULO DINÂMICO ---
-function atualizarContagem() {
-    const qtdNormais = parseInt(document.getElementById('qtd-rodadas').value) || 0;
-    const intervalo = parseInt(document.getElementById('intervalo-bonus').value) || 0;
+// --- CÁLCULO DINÂMICO PARA AS DUAS TELAS ---
+function atualizarContagem(tipo = 'live') {
+    const prefix = tipo === 'single' ? '-single' : '';
+    const qtdNormais = parseInt(document.getElementById('qtd-rodadas' + prefix).value) || 0;
+    const intervalo = parseInt(document.getElementById('intervalo-bonus' + prefix).value) || 0;
     let qtdBonus = (intervalo > 0) ? Math.floor(qtdNormais / intervalo) : 0;
     const total = qtdNormais + qtdBonus;
-    const avisoDiv = document.getElementById('aviso-total');
+    const avisoDiv = document.getElementById('aviso-total' + prefix);
     
     if (intervalo === 0) {
         avisoDiv.innerText = `Serão ${total} perguntas no total (Apenas Normais)`;
@@ -16,7 +17,10 @@ function atualizarContagem() {
         avisoDiv.style.color = "#ffcc00";
     }
 }
-window.addEventListener('DOMContentLoaded', atualizarContagem);
+window.addEventListener('DOMContentLoaded', () => {
+    atualizarContagem('live');
+    atualizarContagem('single');
+});
 
 // --- SISTEMA DE ÁUDIO ---
 const audioMusica = new Audio('musica-fundo.mp3'); audioMusica.loop = true; audioMusica.volume = 0.1; audioMusica.load(); 
@@ -77,23 +81,30 @@ function mostrarBalaoChat(user, message) {
     setTimeout(() => { if (bubble.parentElement) bubble.remove(); }, 4000);
 }
 
-// --- VARIÁVEIS DA PARTIDA ---
+// --- VARIÁVEIS GERAIS DA PARTIDA ---
+let modoGlobal = 'live'; 
 let configAtual = { modo: 'ffa' };
 let rodadaAtualIndex = -1; 
 let perguntasSorteadas = [];
-let votosPorUsuario = {}; 
-let contagemVotos = { A: 0, B: 0, C: 0, D: 0 };
-let pontuacaoIndividual = {}; 
 let jogoRodando = false;
 
-// VARIÁVEIS DE TEMPO - AJUSTADO PARA 60 SEGUNDOS
+// VARIÁVEIS DE TEMPO
 let tempoTotal = 60;
 let tempoRestante = 60;
 let intervalo;
 
-// VARIÁVEIS DO NOVO MODO 1x1
-let chatGeralParticipantes = []; // Guarda todo mundo que falar no chat
-let jogadoresDuelo = []; // Os 2 sorteados
+// VARIÁVEIS MODO LIVE
+let canalTwitchAtual = "";
+let votosPorUsuario = {}; 
+let contagemVotos = { A: 0, B: 0, C: 0, D: 0 };
+let pontuacaoIndividual = {}; 
+let chatGeralParticipantes = []; 
+let jogadoresDuelo = []; 
+
+// VARIÁVEIS MODO SINGLEPLAYER
+let nomeJogadorSingle = "Jogador";
+let votoSingleplayer = null;
+let pontuacaoSingle = 0;
 
 function mudarTela(idNovaTela) {
     document.querySelectorAll('.tela').forEach(t => t.classList.remove('ativa'));
@@ -113,23 +124,9 @@ function voltarMenuJogo() {
     document.getElementById('justificativa-box').style.display = "none";
 }
 
-function iniciarJogo() {
-    configAtual.modo = document.getElementById('modo-jogo').value;
-
-    // VERIFICAÇÃO DO MODO 1x1 COM O NOVO MODAL CUSTOMIZADO
-    if (configAtual.modo === '1v1') {
-        if (chatGeralParticipantes.length < 2) {
-            mostrarAlerta("Não há pelo menos 2 pessoas que tenham interagido no chat para sortear o Duelo! Peça para o chat digitar qualquer coisa e tente novamente.");
-            return; // Impede o jogo de iniciar
-        }
-        let embaralhados = [...chatGeralParticipantes].sort(() => 0.5 - Math.random());
-        jogadoresDuelo = [embaralhados[0], embaralhados[1]];
-    }
-
-    const qtdNormais = parseInt(document.getElementById('qtd-rodadas').value);
-    const intervaloBonus = parseInt(document.getElementById('intervalo-bonus').value);
+// LÓGICA COMPARTILHADA PARA SORTEAR PERGUNTAS
+function prepararPerguntas(qtdNormais, intervaloBonus) {
     perguntasSorteadas = [];
-
     let normaisEmbaralhadas = [...bancoDePerguntas].sort(() => Math.random() - 0.5);
     let bonusEmbaralhadas = [...bancoDePerguntasBonus].sort(() => Math.random() - 0.5);
     let contadorBonus = 0;
@@ -142,26 +139,91 @@ function iniciarJogo() {
             pBonus.isBonus = true; perguntasSorteadas.push(pBonus); contadorBonus++;
         }
     }
+}
+
+// INICIAR LIVE
+function iniciarJogoLive() {
+    const canalInput = document.getElementById('twitch-channel').value.trim();
+    if(!canalInput) {
+        mostrarAlerta("Digite o nome do canal da Twitch para conectar!");
+        return;
+    }
+    
+    if(canalTwitchAtual !== canalInput.toLowerCase()) {
+        ComfyJS.Init(canalInput.toLowerCase());
+        canalTwitchAtual = canalInput.toLowerCase();
+    }
+
+    modoGlobal = 'live';
+    configAtual.modo = document.getElementById('modo-jogo').value;
+
+    if (configAtual.modo === '1v1') {
+        if (chatGeralParticipantes.length < 2) {
+            mostrarAlerta("Não há pelo menos 2 pessoas no chat para o Duelo! Peça para o chat digitar algo e tente novamente.");
+            return;
+        }
+        let embaralhados = [...chatGeralParticipantes].sort(() => 0.5 - Math.random());
+        jogadoresDuelo = [embaralhados[0], embaralhados[1]];
+    }
+
+    prepararPerguntas(
+        parseInt(document.getElementById('qtd-rodadas').value),
+        parseInt(document.getElementById('intervalo-bonus').value)
+    );
 
     rodadaAtualIndex = -1; pontuacaoIndividual = {}; 
+    iniciarInterfaceJogo();
     
+    if (configAtual.modo === '1v1') {
+        document.getElementById('dica-teclado').innerHTML = `<b>⚔️ DUELO SORTEADO: ${jogadoresDuelo[0]} VS ${jogadoresDuelo[1]}</b><br>Pressione [ESPAÇO] para iniciar!`;
+    } else {
+        document.getElementById('dica-teclado').innerText = "Pressione [ESPAÇO] para iniciar a 1ª rodada!";
+    }
+}
+
+// INICIAR SINGLEPLAYER
+function iniciarJogoSingle() {
+    nomeJogadorSingle = document.getElementById('nome-jogador').value.trim() || "Jogador 1";
+    modoGlobal = 'single';
+    pontuacaoSingle = 0;
+
+    prepararPerguntas(
+        parseInt(document.getElementById('qtd-rodadas-single').value),
+        parseInt(document.getElementById('intervalo-bonus-single').value)
+    );
+
+    rodadaAtualIndex = -1;
+    iniciarInterfaceJogo();
+    document.getElementById('dica-teclado').innerText = `Pressione [ESPAÇO] para iniciar a partida de ${nomeJogadorSingle}!`;
+}
+
+function iniciarInterfaceJogo() {
     document.getElementById('caixa-pergunta').style.display = "none";
     document.getElementById('container-tempo').style.display = "none";
     document.getElementById('resultado').style.display = "none";
     document.getElementById('btn-encerrar').style.display = "none";
     document.getElementById('justificativa-box').style.display = "none";
-    
-    // Mostra mensagem especial se for duelo
-    if (configAtual.modo === '1v1') {
-        document.getElementById('dica-teclado').innerHTML = `<b>⚔️ DUELO SORTEADO: ${jogadoresDuelo[0]} VS ${jogadoresDuelo[1]}</b><br>Pressione [ESPAÇO] para iniciar!`;
-    } else {
-        document.getElementById('dica-teclado').innerText = "Pressione [ESPAÇO] para iniciar!";
-    }
-    
     esconderAlternativas();
+    
     mudarTela('tela-jogo');
     audioMusica.pause(); musicaTocando = false;
 }
+
+// FUNÇÃO DE CLIQUE SINGLEPLAYER (MODIFICADA PARA ENCERRAR A RODADA NA HORA)
+function votarSingleplayer(letra) {
+    if(modoGlobal !== 'single' || !jogoRodando) return;
+    
+    votoSingleplayer = letra;
+    ['A', 'B', 'C', 'D'].forEach(l => {
+        document.getElementById(`linha-${l.toLowerCase()}`).classList.remove('selecionada');
+    });
+    document.getElementById(`linha-${letra.toLowerCase()}`).classList.add('selecionada');
+
+    // MÁGICA AQUI: Pega a pergunta atual e aciona o fim da rodada imediatamente
+    const perguntaAtual = perguntasSorteadas[rodadaAtualIndex];
+    encerrarRodada(perguntaAtual);
+}
+
 
 document.addEventListener('keydown', (event) => {
     if (event.code === 'Space' && telaDeJogoAtiva) {
@@ -174,6 +236,7 @@ function avancarRodada() {
     document.getElementById('resultado').style.display = "none";
     document.getElementById('justificativa-box').style.display = "none";
 
+    // FIM DO JOGO
     if (rodadaAtualIndex >= perguntasSorteadas.length) {
         document.getElementById('caixa-pergunta').style.display = "block";
         document.getElementById('texto-pergunta').innerText = "🏁 FIM DE JOGO! 🏁";
@@ -186,7 +249,11 @@ function avancarRodada() {
         resultadoDiv.style.display = "block";
         resultadoDiv.className = "caixa-resultado";
 
-        if (configAtual.modo === 'ffa') {
+        if(modoGlobal === 'single') {
+            resultadoDiv.innerHTML = `🏆 RESULTADO FINAL 🏆<br><br><div class="podio-item">👤 ${nomeJogadorSingle}: ${pontuacaoSingle} pts</div>`;
+            tocarSFX(audioVitoria);
+        } 
+        else if (configAtual.modo === 'ffa') {
             let rankingArray = Object.entries(pontuacaoIndividual).sort((a, b) => b[1] - a[1]);
             let rankingHtml = "🏆 RANKING FINAL DO CHAT 🏆<br><br>";
             if (rankingArray.length === 0) {
@@ -219,7 +286,6 @@ function avancarRodada() {
             
             rankingHtml += `</div>`;
             resultadoDiv.innerHTML = rankingHtml;
-
         } else {
             resultadoDiv.innerText = "Obrigado por jogarem no modo Unidos!"; tocarSFX(audioVitoria);
         }
@@ -228,20 +294,31 @@ function avancarRodada() {
         return;
     }
 
+    // PREPARA A NOVA RODADA
     const pergunta = perguntasSorteadas[rodadaAtualIndex];
     votosPorUsuario = {}; contagemVotos = { A: 0, B: 0, C: 0, D: 0 }; 
+    votoSingleplayer = null; // Reseta voto
     tempoRestante = tempoTotal; jogoRodando = true;
 
     ['a', 'b', 'c', 'd'].forEach(letra => {
         const linha = document.getElementById(`linha-${letra}`);
-        linha.classList.remove('resposta-certa', 'resposta-errada');
-        document.getElementById(`votos-${letra}`).innerText = "0";
+        linha.classList.remove('resposta-certa', 'resposta-errada', 'selecionada');
+        
+        if(modoGlobal === 'single') {
+            document.getElementById(`votos-${letra}`).parentElement.style.display = "none";
+            linha.classList.add('clicavel');
+        } else {
+            document.getElementById(`votos-${letra}`).innerText = "0";
+            document.getElementById(`votos-${letra}`).parentElement.style.display = "block";
+            linha.classList.remove('clicavel');
+        }
     });
 
     document.getElementById('caixa-pergunta').style.display = "block";
     const tituloDiv = document.getElementById('texto-pergunta');
     
-    let textoIntro = configAtual.modo === '1v1' ? `Duelo (${jogadoresDuelo[0]} vs ${jogadoresDuelo[1]})` : `Rodada ${rodadaAtualIndex + 1}`;
+    let textoIntro = `Rodada ${rodadaAtualIndex + 1}`;
+    if (modoGlobal === 'live' && configAtual.modo === '1v1') textoIntro = `Duelo (${jogadoresDuelo[0]} vs ${jogadoresDuelo[1]})`;
 
     if (pergunta.isBonus) {
         tituloDiv.innerHTML = `🌟 <span style="color:#ffcc00">BÔNUS - ${textoIntro}:</span> ${pergunta.texto}`;
@@ -264,7 +341,11 @@ function avancarRodada() {
     barraFill.style.width = "100%";
     barraFill.style.backgroundColor = "var(--primary-color)";
     
-    document.getElementById('dica-teclado').innerText = configAtual.modo === '1v1' ? "Apenas os jogadores do Duelo podem votar!" : "Votações abertas no chat!";
+    if(modoGlobal === 'single') {
+        document.getElementById('dica-teclado').innerText = "Clique em uma alternativa para responder!";
+    } else {
+        document.getElementById('dica-teclado').innerText = configAtual.modo === '1v1' ? "Apenas os jogadores do Duelo podem votar!" : "Votações abertas no chat!";
+    }
 
     clearInterval(intervalo);
     intervalo = setInterval(() => {
@@ -283,7 +364,14 @@ function avancarRodada() {
 
 function encerrarRodada(pergunta) {
     jogoRodando = false; clearInterval(intervalo);
-    document.getElementById('timer-text').innerText = "TEMPO ESGOTADO!";
+    
+    // NOVO: Texto inteligente que detecta se foi clique ou se o tempo esgotou
+    if (modoGlobal === 'single' && votoSingleplayer) {
+        document.getElementById('timer-text').innerText = "RESPOSTA REGISTRADA!";
+    } else {
+        document.getElementById('timer-text').innerText = "TEMPO ESGOTADO!";
+    }
+    
     document.getElementById('barra-tempo-fill').style.width = "0%";
     document.getElementById('dica-teclado').innerText = "Pressione [ESPAÇO] para a próxima tela.";
 
@@ -291,6 +379,7 @@ function encerrarRodada(pergunta) {
     
     ['a', 'b', 'c', 'd'].forEach(letra => {
         const card = document.getElementById(`linha-${letra}`);
+        card.classList.remove('clicavel'); // Trava os cliques
         if (letra === impostora) { card.classList.add('resposta-certa'); } else { card.classList.add('resposta-errada'); }
     });
 
@@ -303,7 +392,20 @@ function encerrarRodada(pergunta) {
     const resultadoDiv = document.getElementById('resultado');
     resultadoDiv.style.display = "block";
 
-    if (configAtual.modo === 'coop') {
+    if(modoGlobal === 'single') {
+        if(votoSingleplayer === pergunta.impostora) {
+            pontuacaoSingle += pergunta.isBonus ? 2 : 1;
+            resultadoDiv.className = "caixa-resultado resultado-sucesso";
+            resultadoDiv.innerHTML = `<i class="fa-solid fa-check-circle"></i> Excelente, ${nomeJogadorSingle}!<br>Você encontrou a resposta errada.`;
+            tocarSFX(audioVitoria);
+        } else {
+            resultadoDiv.className = "caixa-resultado resultado-falha";
+            let votoMsg = votoSingleplayer ? `Você votou na ${votoSingleplayer}` : "Você não votou a tempo";
+            resultadoDiv.innerHTML = `<i class="fa-solid fa-skull"></i> Você errou!<br>${votoMsg}, mas a certa era a ${pergunta.impostora}.`;
+            tocarSFX(audioDerrota);
+        }
+    }
+    else if (configAtual.modo === 'coop') {
         let alternativaVencedora = "A"; let maiorNumeroVotos = -1;
         for (const letra in contagemVotos) {
             if (contagemVotos[letra] > maiorNumeroVotos) { maiorNumeroVotos = contagemVotos[letra]; alternativaVencedora = letra; }
@@ -343,8 +445,7 @@ function encerrarRodada(pergunta) {
 function mostrarAlternativas() { ['a', 'b', 'c', 'd'].forEach(letra => document.getElementById(`linha-${letra}`).style.display = "flex"); }
 function esconderAlternativas() { ['a', 'b', 'c', 'd'].forEach(letra => document.getElementById(`linha-${letra}`).style.display = "none"); }
 
-ComfyJS.Init("arthursmk");
-
+// --- EVENTOS DA TWITCH ---
 ComfyJS.onChat = (user, message, flags, self, extra) => {
     mostrarBalaoChat(user, message);
     if (!chatGeralParticipantes.includes(user)) chatGeralParticipantes.push(user);
@@ -357,7 +458,7 @@ ComfyJS.onCommand = (user, command, message, flags, extra) => {
     
     if (!chatGeralParticipantes.includes(user)) chatGeralParticipantes.push(user);
 
-    if (!jogoRodando) return;
+    if (!jogoRodando || modoGlobal === 'single') return; // Ignora votos do chat no singleplayer
     
     if (configAtual.modo === '1v1' && !jogadoresDuelo.includes(user)) return;
 
