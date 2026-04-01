@@ -8,7 +8,16 @@
     --smk-pink-hover: #ff3366;
 }
 
-* { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+* { 
+    box-sizing: border-box; 
+    margin: 0; 
+    padding: 0; 
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+    
+    /* Bloqueia a seleção de texto e imagens ao clicar/arrastar */
+    user-select: none; 
+    -webkit-user-select: none; 
+}
 
 body { background-color: var(--bg-color); color: var(--text-color); display: flex; justify-content: center; height: 100vh; overflow: hidden; }
 
@@ -300,3 +309,23 @@ body { background-color: var(--bg-color); color: var(--text-color); display: fle
 .buy-btn { background-color: #2a2a2a; color: var(--text-muted); border: 1px solid #444; padding: 4px 10px; border-radius: 4px; cursor: pointer; font-size: 0.85rem; transition: 0.2s; }
 .buy-btn.active { background-color: var(--smk-pink); color: white; border-color: var(--smk-pink-hover); font-weight: bold; }
 .buy-btn:hover:not(.active) { background-color: #333; }
+
+/* ================= Custom Scrollbar ================= */
+::-webkit-scrollbar {
+    width: 10px; /* Largura da barra vertical */
+    height: 10px; /* Altura da barra horizontal, se houver */
+}
+
+::-webkit-scrollbar-track {
+    background: var(--bg-color); /* Fundo da trilha da barra */
+    border-left: 1px solid #333;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #444; /* Cor da "maçaneta" da barra */
+    border-radius: 5px; /* Deixa as pontas arredondadas */
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--smk-pink); /* Fica rosa quando passa o mouse por cima! */
+}
