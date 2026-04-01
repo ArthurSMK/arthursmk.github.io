@@ -812,7 +812,7 @@ function calcularSPS() {
     sps = novoSPS * multiplicadorSPSGlobal; 
     
     // Alimenta a variável exclusiva das conquistas de "Hype Total"
-    spsTotal = sps + cliquesTotais; 
+    spsTotal = sps + smkoinsPorCliqueTotais; 
 }
 
 function checarConquistas() {
