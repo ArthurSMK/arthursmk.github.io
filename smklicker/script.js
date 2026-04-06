@@ -1,14 +1,32 @@
-// ================= Variáveis Globais =================
+// ================= Variáveis Globais e Sistema =================
+const VERSAO_ATUAL = "1.1.0";
+
 let smkoins = 0;
 let sps = 0;
-let spsTotal = 0;             // <--- ADICIONADA AQUI
-let spsEstruturas = 0;        // <--- ADICIONADA AQUI
+let spsTotal = 0;             
+let spsEstruturas = 0;        
 let cliquesTotais = 0;
 let estruturasCompradasTotais = 0;
 let smkoinsPorCliqueTotais = 0;
 
+// Novas Variáveis de Status e Ascensão
+let smkoinsGanhosSessao = 0;
+let smkoinsDesdeOInicio = 0;
+let tempoDeJogoSessao = Date.now();
+let tempoDeJogoTotal = Date.now();
+
+let editzBanco = 0;
+let editzTotais = 0;
+
 let multiplicadorSPSGlobal = 1;
-let multiplicadorCompra = 1; // <--- Adicione esta linha
+let multiplicadorCompra = 1; 
+
+// Árvore de Habilidades do Prestígio (Editz) - Agora com reqUpg
+const prestigeUpgrades = [
+    { id: 'p_1', icone: '🧬', nome: 'Sinapse Inicial', desc: 'Aumenta o SPS Total base em +5%.', custo: 1, comprado: false },
+    { id: 'p_2', icone: '🖱️', nome: 'Memória Muscular', desc: 'Seus cliques manuais ficam permanentemente 10% mais fortes.', custo: 3, comprado: false, reqUpg: 'p_1' },
+    { id: 'p_3', icone: '💸', nome: 'Contatos na Indústria', desc: 'Todas as estruturas do jogo ficam permanentemente 5% mais baratas.', custo: 10, comprado: false, reqUpg: 'p_2' }
+];
 
 // ================= Formatador de Números =================
 function formatarNumero(num) {
@@ -571,6 +589,21 @@ const conquistas = [
 ];
 
 // ================= Salvamento e Carregamento (Save/Load) =================
+// ================= Ferramentas Extras =================
+function formatarTempo(ms) {
+    let segs = Math.floor((ms / 1000) % 60);
+    let mins = Math.floor((ms / (1000 * 60)) % 60);
+    let horas = Math.floor((ms / (1000 * 60 * 60)) % 24);
+    let dias = Math.floor(ms / (1000 * 60 * 60 * 24));
+    let str = "";
+    if(dias > 0) str += dias + "d ";
+    if(horas > 0) str += horas + "h ";
+    if(mins > 0) str += mins + "m ";
+    str += segs + "s";
+    return str;
+}
+
+// ================= Salvamento e Carregamento =================
 function salvarJogoManual() {
     salvarJogo();
     mostrarNotificacao('💾 Jogo Salvo com Sucesso!');
@@ -579,10 +612,12 @@ function salvarJogoManual() {
 
 function salvarJogo() {
     const saveData = {
-        smkoins, sps, cliquesTotais, estruturasCompradasTotais, smkoinsPorCliqueTotais, // <-- Adicionada aqui!
+        smkoins, sps, cliquesTotais, estruturasCompradasTotais, smkoinsPorCliqueTotais,
+        smkoinsGanhosSessao, smkoinsDesdeOInicio, tempoDeJogoSessao, tempoDeJogoTotal, editzBanco, editzTotais,
         estruturas: estruturas.map(e => ({ id: e.id, qtd: e.qtd })),
         upgrades: upgrades.map(u => ({ id: u.id, comprado: u.comprado })),
-        conquistas: conquistas.map(c => ({ id: c.id, atingido: c.atingido }))
+        conquistas: conquistas.map(c => ({ id: c.id, atingido: c.atingido })),
+        prestigeUpgrades: prestigeUpgrades.map(p => ({ id: p.id, comprado: p.comprado }))
     };
     localStorage.setItem('smklicker_save', JSON.stringify(saveData));
 }
@@ -594,61 +629,37 @@ function carregarJogo() {
         smkoins = save.smkoins || 0;
         cliquesTotais = save.cliquesTotais || 0;
         estruturasCompradasTotais = save.estruturasCompradasTotais || 0;
-        smkoinsPorCliqueTotais = save.smkoinsPorCliqueTotais || 0; // <-- Adicionada aqui!
+        smkoinsPorCliqueTotais = save.smkoinsPorCliqueTotais || 0;
+        
+        smkoinsGanhosSessao = save.smkoinsGanhosSessao || 0;
+        smkoinsDesdeOInicio = save.smkoinsDesdeOInicio || 0;
+        tempoDeJogoSessao = save.tempoDeJogoSessao || Date.now();
+        tempoDeJogoTotal = save.tempoDeJogoTotal || Date.now();
+        editzBanco = save.editzBanco || 0;
+        editzTotais = save.editzTotais || 0;
 
-        // Carrega estruturas pelo ID
-        if (save.estruturas && save.estruturas[0].id) {
-            save.estruturas.forEach(s => {
-                let est = estruturas.find(e => e.id === s.id);
-                if (est) est.qtd = s.qtd;
-            });
-        }
+        if (save.estruturas && save.estruturas[0].id) save.estruturas.forEach(s => { let est = estruturas.find(e => e.id === s.id); if (est) est.qtd = s.qtd; });
+        if (save.upgrades && save.upgrades[0].id) save.upgrades.forEach(s => { let upg = upgrades.find(u => u.id === s.id); if (upg) upg.comprado = s.comprado; });
+        if (save.conquistas && save.conquistas[0].id) save.conquistas.forEach(s => { let conq = conquistas.find(c => c.id === s.id); if (conq) conq.atingido = s.atingido; });
+        if (save.prestigeUpgrades) save.prestigeUpgrades.forEach(s => { let p = prestigeUpgrades.find(u => u.id === s.id); if (p) p.comprado = s.comprado; });
 
-        // Carrega upgrades pelo ID
-        if (save.upgrades && save.upgrades[0].id) {
-            save.upgrades.forEach(s => {
-                let upg = upgrades.find(u => u.id === s.id);
-                if (upg) upg.comprado = s.comprado;
-            });
-        }
-
-        // Carrega conquistas pelo ID
-        if (save.conquistas && save.conquistas[0].id) {
-            save.conquistas.forEach(s => {
-                let conq = conquistas.find(c => c.id === s.id);
-                if (conq) conq.atingido = s.atingido;
-            });
-        }
-
-        // Recalcula todos os multiplicadores do zero para evitar duplicação
         multiplicadorClique = 1;
         multiplicadorSPSGlobal = 1;
         estruturas.forEach(e => e.mult = 1);
 
-        if (!save.estruturasCompradasTotais) {
-            estruturasCompradasTotais = 0;
-            estruturas.forEach(e => estruturasCompradasTotais += e.qtd);
-        }
-
         upgrades.forEach(u => {
             if(u.comprado) {
-                // Ao carregar o save, ele também precisa respeitar o poder do upgrade
                 let forca = u.poder ? u.poder : 2;
-                
-                if (u.tipo === 'clique') multiplicadorClique *= forca;
                 if (u.tipo === 'global') multiplicadorSPSGlobal *= forca;
-                if (u.tipo === 'estrutura') {
-                    const est = estruturas.find(e => e.id === u.alvo);
-                    if (est) est.mult *= forca;
-                }
+                if (u.tipo === 'estrutura') { const est = estruturas.find(e => e.id === u.alvo); if (est) est.mult *= forca; }
             }
         });
 
         calcularSPS();
         verificarDesbloqueios();
-        renderizarConquistas();
     }
 }
+setInterval(salvarJogo, 300000);
 
 // ================= Bloqueio de Atalhos de Teclado =================
 // Impede que o jogador selecione tudo sem querer usando Ctrl+A
@@ -659,10 +670,14 @@ document.addEventListener('keydown', function(e) {
 });
 
 function resetarJogo() {
-    if (confirm('Tem certeza que deseja apagar todo o seu progresso? Isso não pode ser desfeito!')) {
-        localStorage.removeItem('smklicker_save');
-        location.reload(); // Recarrega a página do zero
-    }
+    mostrarConfirmacao(
+        "🗑️ Apagar Todo o Progresso?",
+        "Tem certeza que deseja apagar <strong>TODO</strong> o seu progresso? Isso não pode ser desfeito!",
+        function() {
+            localStorage.removeItem('smklicker_save');
+            location.reload(); // Recarrega a página do zero
+        }
+    );
 }
 
 // Auto-Save a cada 5 minutos (300.000 ms)
@@ -696,6 +711,25 @@ function mostrarNotificacao(texto) {
     }, 4000);
 }
 
+// Função para substituir o "confirm()" feio do navegador
+function mostrarConfirmacao(titulo, texto, callbackConfirmar) {
+    document.getElementById('confirm-title').innerHTML = titulo;
+    document.getElementById('confirm-text').innerHTML = texto;
+    
+    let btnOk = document.getElementById('btn-confirm-ok');
+    
+    // Clona o botão para remover eventos de cliques anteriores (evita ativar 2 coisas ao mesmo tempo)
+    let novoBtnOk = btnOk.cloneNode(true);
+    btnOk.parentNode.replaceChild(novoBtnOk, btnOk);
+    
+    novoBtnOk.onclick = function() {
+        callbackConfirmar();
+        fecharModal('modal-confirmacao');
+    };
+    
+    abrirModal('modal-confirmacao');
+}
+
 // ================= Funções Principais =================
 // ================= Sistema de Multiplicador de Compra =================
 function mudarMultiplicador(valor) {
@@ -705,52 +739,67 @@ function mudarMultiplicador(valor) {
     atualizarTela();
 }
 
+// A função de Desconto por Prestígio
+function getPrestigeDesconto() {
+    return prestigeUpgrades.find(p => p.id === 'p_3').comprado ? 0.95 : 1;
+}
+
 function getCustoAcumulado(est, qtdDesejada) {
-    let custoTotal = 0;
-    let qtdAtual = est.qtd;
+    let custoTotal = 0; let qtdAtual = est.qtd; let desconto = getPrestigeDesconto();
     for (let i = 0; i < qtdDesejada; i++) {
-        custoTotal += Math.floor(est.custoBase * Math.pow(1.15, qtdAtual + i));
+        custoTotal += Math.floor(est.custoBase * Math.pow(1.15, qtdAtual + i) * desconto);
     }
     return custoTotal;
 }
 
 function getMaxCompra(est, maxDesejado) {
-    let custoTotal = 0;
-    let qtdAtual = est.qtd;
-    let comprados = 0;
+    let custoTotal = 0; let qtdAtual = est.qtd; let comprados = 0; let desconto = getPrestigeDesconto();
     for (let i = 0; i < maxDesejado; i++) {
-        let custoProximo = Math.floor(est.custoBase * Math.pow(1.15, qtdAtual + i));
-        if (smkoins >= custoTotal + custoProximo) {
-            custoTotal += custoProximo;
-            comprados++;
-        } else {
-            break;
-        }
+        let custoProximo = Math.floor(est.custoBase * Math.pow(1.15, qtdAtual + i) * desconto);
+        if (smkoins >= custoTotal + custoProximo) { custoTotal += custoProximo; comprados++; } else break;
     }
     return comprados;
 }
 
-// ================= Funções Principais =================
-
-// Nova função: Calcula quanto vale o seu clique em tempo real
 function getValorClique() {
-    // Descobre quantos upgrades de clique você já comprou
     let qtdUpgradesClique = upgrades.filter(u => u.tipo === 'clique' && u.comprado).length;
-    // O clique base é 1. Soma 1% (0.01) do SPS atual para CADA upgrade comprado.
-    return 1 + (sps * 0.01 * qtdUpgradesClique);
+    let base = 1 + (sps * 0.01 * qtdUpgradesClique);
+    let bonusMuscular = prestigeUpgrades.find(p => p.id === 'p_2').comprado ? 1.10 : 1; // Habilidade 2
+    return base * bonusMuscular;
+}
+
+function calcularSPS() {
+    let novoSPS = 0;
+    estruturas.forEach(est => { novoSPS += (est.qtd * est.spsBase * est.mult); });
+    spsEstruturas = novoSPS; 
+
+    // Bônus do Tabuleiro (+1% por Editz e a Habilidade P1)
+    let multiplicadorAscensao = 1 + (editzTotais * 0.01);
+    let bonusSkillTree = prestigeUpgrades.find(p => p.id === 'p_1').comprado ? 1.05 : 1; // Habilidade 1
+
+    sps = novoSPS * multiplicadorSPSGlobal * multiplicadorAscensao * bonusSkillTree; 
+    spsTotal = sps; 
 }
 
 function clicarBorboleta() {
     let ganhoClique = getValorClique();
-    
     smkoins += ganhoClique;
-    smkoinsPorCliqueTotais += ganhoClique; // Conta para liberar os próximos mouses!
+    smkoinsGanhosSessao += ganhoClique;   // <-- Adicionado
+    smkoinsDesdeOInicio += ganhoClique; // <-- Adicionado
+    smkoinsPorCliqueTotais += ganhoClique; 
     cliquesTotais++;
-    
-    verificarDesbloqueios(); 
-    atualizarTela();
-    checarConquistas();
+    verificarDesbloqueios(); atualizarTela(); checarConquistas();
 }
+
+// O Loop infinito (geralmente fica lá no final do arquivo) modifique para isto:
+setInterval(() => {
+    let ganhoTick = sps / 10;
+    smkoins += ganhoTick;
+    smkoinsGanhosSessao += ganhoTick;   // <-- Adicionado
+    smkoinsDesdeOInicio += ganhoTick; // <-- Adicionado
+    atualizarTela();
+    if (Math.random() < 0.05) checarConquistas();
+}, 100);
 
 function comprarEstrutura(index) {
     const est = estruturas[index];
@@ -1036,3 +1085,196 @@ renderizarEstruturas();
 renderizarUpgrades();
 renderizarConquistas();
 atualizarTela();
+
+// ================= Sistema de Menus e UI =================
+function mudarAba(evt, tabId) {
+    let i, tabcontent, tablinks;
+    tabcontent = document.getElementsByClassName("tab-content");
+    for (i = 0; i < tabcontent.length; i++) { tabcontent[i].style.display = "none"; }
+    tablinks = document.getElementsByClassName("tab-btn");
+    for (i = 0; i < tablinks.length; i++) { tablinks[i].className = tablinks[i].className.replace(" active", ""); }
+    document.getElementById(tabId).style.display = "block";
+    evt.currentTarget.className += " active";
+}
+
+function abrirModalEstatisticas() {
+    renderizarEstatisticas();
+    abrirModal('modal-estatisticas');
+}
+
+function renderizarEstatisticas() {
+    document.getElementById('tab-geral').innerHTML = `
+        <ul class="stats-list">
+            <li><strong>SMKoins no banco:</strong> ${formatarNumero(smkoins)}</li>
+            <li><strong>SMKoins (nesta ascensão):</strong> ${formatarNumero(smkoinsGanhosSessao)}</li>
+            <li><strong>SMKoins (desde o início):</strong> ${formatarNumero(smkoinsDesdeOInicio)}</li>
+            <li><strong>Sequência Iniciada:</strong> Há ${formatarTempo(Date.now() - tempoDeJogoSessao)}</li>
+            <li><strong>Tempo de Jogo (Total):</strong> ${formatarTempo(Date.now() - tempoDeJogoTotal)}</li>
+            <li><strong>Estruturas Obtidas:</strong> ${formatarNumero(estruturasCompradasTotais)}</li>
+            <li><strong>SMKoins por segundo:</strong> ${formatarNumero(sps)}</li>
+            <li><strong>SMKoins por clique:</strong> ${formatarNumero(getValorClique())}</li>
+            <li><strong>Cliques na Borboleta:</strong> ${formatarNumero(cliquesTotais)}</li>
+            <li><strong>Versão em Execução:</strong> ${VERSAO_ATUAL}</li>
+        </ul>
+    `;
+
+    let upgradesComprados = upgrades.filter(u => u.comprado);
+    document.getElementById('melhorias-progresso').innerText = `Melhorias desbloqueadas: ${upgradesComprados.length}/${upgrades.length} (${Math.floor((upgradesComprados.length/upgrades.length)*100)}%)`;
+    let htmlUpgrades = '';
+    upgradesComprados.forEach((upg, i) => {
+        let styleBg = upg.icone.startsWith('url') ? `background-image: ${upg.icone}; color: transparent;` : '';
+        htmlUpgrades += `<div class="square-icon conq-unlocked" style="${styleBg}" onmouseenter="showUpgradeTooltipTooltipData('${upg.nome}', '${upg.desc}')" onmouseleave="hideTooltip()">${!upg.icone.startsWith('url') ? upg.icone : ''}</div>`;
+    });
+    document.getElementById('upgrades-comprados-container').innerHTML = htmlUpgrades;
+
+    let conquistasDesbloqueadas = conquistas.filter(c => c.atingido);
+    document.getElementById('conquistas-progresso').innerText = `Conquistas desbloqueadas: ${conquistasDesbloqueadas.length}/${conquistas.length} (${Math.floor((conquistasDesbloqueadas.length/conquistas.length)*100)}%)`;
+    renderizarConquistas();
+}
+
+window.showUpgradeTooltipTooltipData = function(nome, desc) {
+    tooltip.innerHTML = `<h4>${nome}</h4><p>${desc}</p>`;
+    tooltip.style.display = 'block';
+};
+
+// ================= Matemática da Ascensão =================
+function calcularEditzParaGanhar() {
+    if (smkoinsDesdeOInicio < 1e12) return 0;
+    let editzCalculados = Math.floor(Math.cbrt(smkoinsDesdeOInicio / 1e12));
+    return Math.max(0, editzCalculados - editzTotais);
+}
+
+function calcularSMKoinsProximoEditz() {
+    let proximoNivel = editzTotais + calcularEditzParaGanhar() + 1;
+    let smkoinsNecessarios = Math.pow(proximoNivel, 3) * 1e12;
+    return smkoinsNecessarios - smkoinsDesdeOInicio;
+}
+
+window.showPrestigeTooltip = function() {
+    let editzAGanhar = calcularEditzParaGanhar();
+    let faltaParaProximo = calcularSMKoinsProximoEditz();
+    
+    let html = `<h4>O Tabuleiro (Reset)</h4>`;
+    html += `<p>Tempo nesta sequência: <strong>${formatarTempo(Date.now() - tempoDeJogoSessao)}</strong></p>`;
+
+    if (editzAGanhar > 0) {
+        html += `<p style="color: gold; margin-top: 10px;">Se resetar agora, você ganhará <strong>+${formatarNumero(editzAGanhar)} Editz</strong>!</p>`;
+    } else {
+        html += `<p style="color: var(--text-muted); margin-top: 10px;">Se resetar agora você não ganhará nenhum ponto.</p>`;
+    }
+    html += `<p style="font-size: 0.8rem; margin-top: 5px;">Faltam ${formatarNumero(faltaParaProximo)} SMKoins produzidos para gerar o próximo Editz.</p>`;
+    
+    tooltip.innerHTML = html;
+    tooltip.style.display = 'block';
+};
+
+// Função para abrir o modal manualmente e já carregar os dados
+// Abre apenas o modal de aviso de reset
+window.abrirModalAscensao = function() {
+    abrirModal('modal-ascensao');
+};
+
+// O Reset Dramático com Animação Perfeita (Agora com Modal Customizado)
+window.realizarAscensao = function() {
+    let editzAGanhar = calcularEditzParaGanhar();
+    
+    mostrarConfirmacao(
+        "🌌 Explorar O Tabuleiro?",
+        `Tem certeza que deseja Ascender?<br><br>Você perderá suas construções, SMKoins atuais e upgrades normais.<br>Você ganhará <strong style="color: gold; font-size: 1.2rem;">+${formatarNumero(editzAGanhar)} Editz</strong>!`,
+        function() {
+            // Roda apenas se o jogador clicar em "Confirmar"
+            editzTotais += editzAGanhar;
+            editzBanco += editzAGanhar;
+            
+            fecharModal('modal-ascensao');
+            
+            let gameContainer = document.querySelector('.game-container');
+            gameContainer.classList.add('desligando');
+            
+            setTimeout(() => {
+                // Zera o progresso atual
+                smkoins = 0; sps = 0; smkoinsGanhosSessao = 0; smkoinsPorCliqueTotais = 0;
+                estruturasCompradasTotais = 0; tempoDeJogoSessao = Date.now();
+                
+                estruturas.forEach(e => e.qtd = 0);
+                
+                // Reseta a visibilidade da loja
+                upgrades.forEach(u => {
+                    u.comprado = false;
+                    u.visivel = (u.id === 'cafe_expresso'); 
+                });
+                
+                salvarJogo();
+                
+                gameContainer.classList.remove('desligando'); 
+                gameContainer.style.display = 'none'; // Esconde o jogo base
+                
+                // Abre a tela dedicada do Tabuleiro
+                abrirTelaArvore();
+                
+            }, 1200); 
+        }
+    );
+};
+
+// ================= Lógica da Nova Tela de Árvore =================
+window.abrirTelaArvore = function() {
+    document.getElementById('tela-arvore').style.display = 'flex';
+    renderizarArvore();
+};
+
+window.renderizarArvore = function() {
+    document.getElementById('editz-banco-arvore').innerText = formatarNumero(editzBanco);
+    document.getElementById('editz-bonus-arvore').innerText = `+${formatarNumero(editzTotais)}% SPS`;
+
+    const container = document.getElementById('skill-tree-container');
+    container.innerHTML = '';
+    
+    prestigeUpgrades.forEach((upg, i) => {
+        // Lógica de Árvore Verdadeira: Só mostra se não tiver reqUpg, OU se o reqUpg já estiver comprado
+        let visivel = true;
+        if (upg.reqUpg) {
+            let req = prestigeUpgrades.find(p => p.id === upg.reqUpg);
+            if (!req || !req.comprado) visivel = false;
+        }
+
+        if (visivel) {
+            let classe = upg.comprado ? 'comprado' : (editzBanco >= upg.custo ? '' : 'disabled');
+            container.innerHTML += `
+                <div class="skill-tree-item ${classe}" onclick="comprarSkillTree(${i})">
+                    <div style="font-size: 3rem; margin-bottom: 10px;">${upg.icone}</div>
+                    <h4 style="font-size: 1.1rem; color: ${upg.comprado ? 'var(--smk-pink)' : '#fff'}">${upg.nome}</h4>
+                    <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 8px;">${upg.desc}</p>
+                    <p style="margin-top: 15px; font-weight: bold; color: gold; font-size: 1.1rem;">${upg.comprado ? 'COMPRADO' : upg.custo + ' Editz'}</p>
+                </div>
+            `;
+        }
+    });
+};
+
+window.comprarSkillTree = function(index) {
+    let upg = prestigeUpgrades[index];
+    if (editzBanco >= upg.custo && !upg.comprado) {
+        editzBanco -= upg.custo;
+        upg.comprado = true;
+        salvarJogo();
+        calcularSPS(); 
+        renderizarArvore(); // Recarrega a árvore para liberar o próximo item!
+    }
+};
+
+window.reabrirLive = function() {
+    document.getElementById('tela-arvore').style.display = 'none';
+    
+    let gameContainer = document.querySelector('.game-container');
+    gameContainer.style.display = 'flex';
+    
+    // Animação da TV ligando de volta
+    gameContainer.style.animation = 'crt-turnon 0.5s ease-out forwards';
+    setTimeout(() => { gameContainer.style.animation = ''; }, 500);
+    
+    // Redesenha o jogo base limpo
+    renderizarEstruturas(); 
+    renderizarUpgrades(); 
+    atualizarTela();
+};

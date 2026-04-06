@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jogo Dos 100</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="menu-screen" class="screen">
+        <div class="menu-content">
+            <h1>Jogo Dos <span class="highlight">100</span></h1>
+            <p>Descubra as respostas mais populares para a pergunta do dia.</p>
+            <div class="instructions">
+                <p>✔️ Adivinhe o que 100 pessoas responderam.</p>
+                <p>❌ Você tem apenas 3 vidas (chances de errar).</p>
+                <p>📅 Um novo desafio todos os dias!</p>
+            </div>
+            <div class="menu-actions">
+                <button id="btn-start" class="btn-primary">Jogar o Desafio de Hoje</button>
+                <button id="btn-open-calendar" class="btn-secondary">📅 Ver Calendário</button>
+            </div>
+            </div> <div class="social-section">
+                <p>Me acompanhe nas redes:</p>
+                <div class="social-links">
+                    <a href="https://youtube.com/@arthursmk18" target="_blank" class="social-btn youtube">YouTube</a>
+                    <a href="https://twitch.tv/arthursmk" target="_blank" class="social-btn twitch">Twitch</a>
+                    <a href="https://tiktok.com/@arthursmk" target="_blank" class="social-btn tiktok">TikTok</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="calendar-modal" class="modal hidden">
+        <div class="modal-content calendar-content">
+            <h2>Desafios Anteriores</h2>
+            <p class="subtitle">Jogue os dias que você perdeu ou deixou passar.</p>
+            
+            <div class="calendar-wrapper">
+                <div class="calendar-header">
+                    <button id="btn-prev-month" class="btn-nav">&lt;</button>
+                    <h3 id="calendar-month-year">Mês Ano</h3>
+                    <button id="btn-next-month" class="btn-nav">&gt;</button>
+                </div>
+                <div class="calendar-weekdays">
+                    <span>D</span><span>S</span><span>T</span><span>Q</span><span>Q</span><span>S</span><span>S</span>
+                </div>
+                <div id="calendar-grid" class="calendar-grid">
+                    </div>
+            </div>
+
+            <div class="modal-actions">
+                <button id="btn-close-calendar" class="btn-secondary">Fechar Calendário</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="game-screen" class="screen hidden">
+        <button id="btn-back-from-game" class="btn-text">⬅ Voltar ao Menu</button>
+
+        <header class="game-header">
+            <div class="score-container">
+                <span class="score-label">Pontuação</span>
+                <span id="score-display" class="score-value">0/100</span>
+            </div>
+            <div class="lives-container" id="lives-display">
+                <span class="life"></span>
+                <span class="life"></span>
+                <span class="life"></span>
+            </div>
+        </header>
+
+        <main class="game-main">
+            <h2 id="question-display">Carregando pergunta...</h2>
+            
+            <div id="board" class="board">
+                </div>
+
+            <div class="input-section">
+                <input type="text" id="guess-input" placeholder="Digite sua resposta..." autocomplete="off">
+                <button id="btn-submit" class="btn-primary">Enviar</button>
+                <button id="btn-hint" class="btn-secondary hint-btn" title="Pedir Dica">💡</button>
+            </div>
+            <p id="feedback-message" class="feedback"></p>
+
+            <div id="wrong-guesses-container" class="hidden">
+                <p class="wrong-guesses-title">Tentativas incorretas:</p>
+                <div id="wrong-guesses-list"></div>
+            </div>
+        </main>
+    </div>
+
+    <div id="end-modal" class="modal hidden">
+        <div class="modal-content">
+            <h2 id="end-title">Fim de Jogo</h2>
+            <p id="end-score-text">Você conseguiu <span id="final-score" class="highlight">0</span> pontos!</p>
+            
+            <p id="end-hints-display" style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 15px;">Dicas usadas: <span id="final-hints" class="highlight">0</span></p>
+
+            <div id="missed-words-container" class="hidden">
+                <p>Faltou descobrir:</p>
+                <ul id="missed-words-list"></ul>
+            </div>
+            <div class="modal-actions">
+                <button id="btn-share" class="btn-primary">Compartilhar Pontuação</button>
+                <button id="btn-back-menu" class="btn-secondary" style="margin-top: 10px;">Voltar ao Menu</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

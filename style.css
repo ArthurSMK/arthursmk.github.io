@@ -10,6 +10,7 @@
     /* A cor da sua marca no modo claro (Rosa) */
     --brand-color: #fd0041; 
     --caca-erro: #fd0041;
+    --jogodos100: #fd0041;
     --tabuleiro: #cba6f7;
     --smklicker: #fd0041;
     --em-breve: #e0e0e0;
@@ -30,6 +31,7 @@
     --caca-erro: #fd0041;
     --tabuleiro: #cba6f7;
     --smklicker: #fd0041;
+    --jogodos100: #fd0041;
     --em-breve: #333333;
 }
 
@@ -143,6 +145,7 @@ header p {
 .caca-erro-bg { background-color: var(--caca-erro); }
 .tabuleiro-bg { background-color: var(--tabuleiro); }
 .smklicker-bg { background-color: var(--smklicker); }
+.jogodos100-bg { background-color: var(--jogodos100); }
 .futsal-bg { background-color: var(--em-breve); border-style: dashed; }
 
 .em-breve { cursor: default; opacity: 0.7; }

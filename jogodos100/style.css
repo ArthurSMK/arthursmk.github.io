@@ -1,0 +1,566 @@
+:root {
+    --bg-main: #050505;
+    --bg-panel: #1a1a1a;
+    --bg-panel-light: #2a2a2a;
+    --text-main: #ffffff;
+    --text-muted: #aaaaaa;
+    --accent: #fd0041;
+    --accent-hover: #e0003a;
+    --border-radius: 8px;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+    background-color: var(--bg-main);
+    color: var(--text-main);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+}
+
+.hidden {
+    display: none !important;
+}
+
+.highlight {
+    color: var(--accent);
+}
+
+.screen {
+    width: 100%;
+    max-width: 600px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+}
+
+/* --- MENU --- */
+.menu-content {
+    background-color: var(--bg-panel);
+    padding: 40px;
+    border-radius: var(--border-radius);
+    text-align: center;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+}
+
+.menu-content h1 {
+    font-size: 3rem;
+    margin-bottom: 10px;
+}
+
+.instructions {
+    margin: 30px 0;
+    text-align: left;
+    background-color: var(--bg-panel-light);
+    padding: 20px;
+    border-radius: var(--border-radius);
+}
+
+.instructions p {
+    margin: 10px 0;
+    font-size: 1.1rem;
+}
+
+.menu-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+/* --- BOTÕES --- */
+.btn-primary {
+    background-color: var(--accent);
+    color: var(--text-main);
+    border: none;
+    padding: 15px 30px;
+    font-size: 1.2rem;
+    font-weight: bold;
+    border-radius: var(--border-radius);
+    cursor: pointer;
+    transition: background-color 0.2s, transform 0.1s;
+    width: 100%;
+}
+
+.btn-primary:hover {
+    background-color: var(--accent-hover);
+}
+
+.btn-primary:active {
+    transform: scale(0.98);
+}
+
+.btn-secondary {
+    background-color: transparent;
+    color: var(--text-main);
+    border: 2px solid var(--accent);
+    padding: 12px 20px;
+    font-size: 1.1rem;
+    font-weight: bold;
+    border-radius: var(--border-radius);
+    cursor: pointer;
+    transition: all 0.2s;
+    width: 100%;
+}
+
+.btn-secondary:hover {
+    background-color: rgba(253, 0, 65, 0.1);
+}
+
+/* --- ÁREA DE JOGO --- */
+.game-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    background-color: var(--bg-panel);
+    padding: 15px 20px;
+    border-radius: var(--border-radius);
+}
+
+.score-container {
+    display: flex;
+    flex-direction: column;
+}
+
+.score-label {
+    font-size: 0.9rem;
+    color: var(--text-muted);
+}
+
+.score-value {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: var(--accent);
+}
+
+.lives-container {
+    display: flex;
+    gap: 10px;
+}
+
+.life {
+    width: 30px;
+    height: 30px;
+    border: 2px solid var(--bg-panel-light);
+    border-radius: 5px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: var(--accent);
+    background-color: var(--bg-main);
+}
+
+.life.lost::after {
+    content: 'X';
+}
+
+#question-display {
+    font-size: 1.5rem;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+/* --- TABULEIRO --- */
+.board {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 10px;
+    margin-bottom: 25px;
+}
+
+.answer-slot {
+    background-color: var(--bg-panel);
+    border: 2px solid var(--bg-panel-light);
+    border-radius: var(--border-radius);
+    padding: 15px 20px;
+    display: flex;
+    justify-content: space-between;
+    font-size: 1.2rem;
+    font-weight: bold;
+    transition: all 0.3s ease;
+}
+
+.answer-slot.hidden-answer {
+    color: transparent;
+    background-color: var(--bg-panel-light);
+    border-color: var(--bg-panel);
+}
+
+.answer-slot.hidden-answer .points {
+    color: transparent;
+}
+
+.answer-slot.revealed {
+    background-color: var(--bg-main);
+    border-color: var(--accent);
+    color: var(--text-main);
+}
+
+.answer-slot.missed {
+    background-color: var(--bg-main);
+    border-color: var(--text-muted);
+    color: var(--text-muted);
+}
+
+.answer-slot .points {
+    color: var(--accent);
+}
+
+.answer-slot.missed .points {
+    color: var(--text-muted);
+}
+
+/* --- INPUT --- */
+.input-section {
+    display: flex;
+    gap: 10px;
+}
+
+#guess-input {
+    flex: 1;
+    padding: 15px;
+    font-size: 1.2rem;
+    background-color: var(--bg-panel);
+    border: 2px solid var(--bg-panel-light);
+    color: var(--text-main);
+    border-radius: var(--border-radius);
+    outline: none;
+    transition: border-color 0.2s;
+}
+
+#guess-input:focus {
+    border-color: var(--accent);
+}
+
+.feedback {
+    text-align: center;
+    margin-top: 10px;
+    height: 20px;
+    font-weight: bold;
+    color: var(--accent);
+}
+
+/* --- MODAIS --- */
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.9);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.modal-content {
+    background-color: var(--bg-panel);
+    padding: 40px;
+    border-radius: var(--border-radius);
+    text-align: center;
+    width: 90%;
+    max-width: 400px;
+    border: 1px solid var(--accent);
+    /* Removido o overflow-y: auto para o balão não cortar */
+    overflow: visible; 
+}
+
+.modal-content h2 {
+    font-size: 2.5rem;
+    margin-bottom: 10px;
+}
+
+.subtitle {
+    color: var(--text-muted);
+    margin-bottom: 20px;
+    font-size: 0.9rem;
+}
+
+#missed-words-container {
+    margin: 20px 0;
+    text-align: left;
+    background-color: var(--bg-main);
+    padding: 15px;
+    border-radius: var(--border-radius);
+}
+
+#missed-words-list {
+    list-style-type: none;
+    color: var(--text-muted);
+    margin-top: 10px;
+}
+
+/* --- CALENDÁRIO COMPLETO --- */
+.calendar-content {
+    max-width: 450px;
+}
+
+.calendar-wrapper {
+    background-color: var(--bg-main);
+    padding: 15px;
+    border-radius: var(--border-radius);
+    margin-bottom: 25px;
+}
+
+.calendar-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.calendar-header h3 {
+    text-transform: capitalize;
+    font-size: 1.2rem;
+    color: var(--accent);
+}
+
+.btn-nav {
+    background-color: var(--bg-panel-light);
+    color: var(--text-main);
+    border: none;
+    padding: 5px 15px;
+    font-size: 1.2rem;
+    border-radius: var(--border-radius);
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.btn-nav:hover {
+    background-color: var(--accent);
+}
+
+.calendar-weekdays {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    margin-bottom: 10px;
+    font-weight: bold;
+    color: var(--text-muted);
+}
+
+.calendar-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 5px;
+}
+
+.calendar-day {
+    background-color: var(--bg-panel-light);
+    color: var(--text-main);
+    border: 2px solid transparent;
+    aspect-ratio: 1 / 1;
+    border-radius: var(--border-radius);
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 1rem;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+}
+
+/* Dias vazios para alinhar a semana */
+.calendar-day.empty {
+    background-color: transparent;
+    cursor: default;
+    pointer-events: none;
+}
+
+/* Dias sem jogo (apagados) */
+.calendar-day.disabled {
+    background-color: transparent;
+    color: #444;
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
+.calendar-day:not(.empty):not(.disabled):hover {
+    border-color: var(--accent);
+    transform: translateY(-2px);
+    z-index: 10;
+}
+
+.calendar-day.won {
+    background-color: rgba(0, 255, 100, 0.1);
+    border-color: #00ff64;
+    color: #00ff64;
+}
+
+.calendar-day.lost {
+    background-color: rgba(253, 0, 65, 0.1);
+    border-color: var(--accent);
+    color: var(--accent);
+}
+
+.calendar-day.playing {
+    border-color: #ffcc00;
+    color: #ffcc00;
+}
+
+/* Tooltip do Calendário */
+.calendar-day[data-tooltip]::after {
+    content: attr(data-tooltip);
+    position: absolute;
+    bottom: 115%;
+    left: 50%;
+    transform: translateX(-50%) translateY(5px);
+    background-color: var(--bg-panel);
+    color: var(--text-main);
+    padding: 8px 12px;
+    border-radius: var(--border-radius);
+    font-size: 0.8rem;
+    font-weight: normal;
+    white-space: nowrap;
+    opacity: 0;
+    pointer-events: none;
+    transition: all 0.2s ease;
+    border: 1px solid var(--accent);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.9);
+}
+
+.calendar-day[data-tooltip]:hover::after {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+}
+
+/* --- TENTATIVAS INCORRETAS --- */
+#wrong-guesses-container {
+    margin-top: 20px;
+    text-align: left;
+    width: 100%;
+}
+
+.wrong-guesses-title {
+    font-size: 0.9rem;
+    color: var(--text-muted);
+    margin-bottom: 10px;
+}
+
+#wrong-guesses-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.wrong-guess-chip {
+    background-color: rgba(253, 0, 65, 0.1);
+    color: var(--accent);
+    border: 1px solid var(--accent);
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    text-decoration: line-through; /* Risca a palavra */
+    animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-5px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* --- REDES SOCIAIS --- */
+.social-section {
+    margin-top: 30px;
+    padding-top: 20px;
+    border-top: 1px solid var(--bg-panel-light);
+}
+
+.social-section p {
+    font-size: 0.9rem;
+    color: var(--text-muted);
+    margin-bottom: 15px;
+}
+
+.social-links {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.social-btn {
+    text-decoration: none;
+    color: var(--text-main);
+    font-weight: bold;
+    font-size: 0.95rem;
+    padding: 10px 15px;
+    border-radius: var(--border-radius);
+    background-color: var(--bg-panel-light);
+    transition: all 0.2s ease;
+    flex: 1; /* Faz os botões dividirem o espaço igualmente */
+    min-width: 80px; /* Garante que não fiquem espremidos no celular */
+}
+
+.social-btn:hover {
+    transform: translateY(-3px);
+}
+
+/* Cores oficias das marcas no Hover */
+.social-btn.youtube:hover {
+    background-color: #FF0000;
+    color: #ffffff;
+}
+
+.social-btn.twitch:hover {
+    background-color: #9146FF;
+    color: #ffffff;
+}
+
+.social-btn.tiktok:hover {
+    background-color: #ffffff;
+    color: #000000;
+    box-shadow: 0 4px 10px rgba(255, 255, 255, 0.2);
+}
+
+/* --- BOTÃO TEXTO (VOLTAR) --- */
+.btn-text {
+    background: none;
+    border: none;
+    color: var(--text-muted);
+    font-size: 1rem;
+    font-weight: bold;
+    cursor: pointer;
+    text-align: left;
+    margin-bottom: 15px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    transition: color 0.2s ease;
+    width: fit-content;
+}
+
+.btn-text:hover {
+    color: var(--accent);
+}
+
+/* --- BOTÃO DE DICA E TRACINHOS --- */
+.hint-btn {
+    flex: 0 0 60px; /* Mantém o botão quadrado e fixo */
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+}
+
+/* Quando a palavra recebe uma dica, o texto deixa de ser transparente */
+.answer-slot.hidden-answer.has-hint {
+    color: var(--text-muted); /* Cor cinza para os tracinhos */
+    letter-spacing: 2px; /* Espaça um pouco os tracinhos para facilitar a contagem */
+}
+
+/* Garante que os pontos continuem escondidos mesmo com a dica revelada */
+.answer-slot.hidden-answer.has-hint .points {
+    color: transparent;
+}

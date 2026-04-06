@@ -329,3 +329,53 @@ body { background-color: var(--bg-color); color: var(--text-color); display: fle
 ::-webkit-scrollbar-thumb:hover {
     background: var(--smk-pink); /* Fica rosa quando passa o mouse por cima! */
 }
+
+/* ================= Sistema de Abas (Tabs) ================= */
+.tabs { display: flex; border-bottom: 2px solid #333; margin-bottom: 20px; }
+.tab-btn { background: none; border: none; color: var(--text-muted); padding: 10px 20px; font-size: 1.1rem; cursor: pointer; transition: 0.3s; font-weight: bold; }
+.tab-btn:hover { color: #fff; }
+.tab-btn.active { color: var(--smk-pink); border-bottom: 3px solid var(--smk-pink); margin-bottom: -2px; }
+.tab-content { display: none; }
+.tab-content.active { display: block; }
+
+/* Status List (Geral) */
+.stats-list { list-style: none; color: var(--text-muted); font-size: 1.1rem; }
+.stats-list li { margin-bottom: 12px; border-bottom: 1px dashed #333; padding-bottom: 5px; }
+.stats-list strong { color: #fff; margin-right: 10px; }
+
+/* Skill Tree Items */
+.skill-tree-item { background-color: #222; border: 2px solid #555; border-radius: 10px; padding: 15px; display: flex; flex-direction: column; align-items: center; text-align: center; cursor: pointer; width: 150px; transition: 0.2s; }
+.skill-tree-item:hover:not(.disabled) { border-color: gold; transform: scale(1.05); }
+.skill-tree-item.disabled { opacity: 0.5; cursor: not-allowed; }
+.skill-tree-item.comprado { border-color: var(--smk-pink); background-color: rgba(253, 0, 65, 0.1); }
+
+/* ================= Efeito de Desligar Tela (Reset) ================= */
+/* Aplica o efeito clássico de TV Tubo (CRT) desligando diretamente no jogo */
+.game-container.desligando {
+    pointer-events: none;
+    animation: crt-shutdown 1.2s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+}
+
+@keyframes crt-shutdown {
+    0% { transform: scale(1, 1); filter: brightness(1); opacity: 1; }
+    40% { transform: scale(1, 0.01); filter: brightness(3); opacity: 1; } /* Achata virando uma linha */
+    70% { transform: scale(0, 0.01); filter: brightness(10); opacity: 1; } /* Encolhe para o centro com muito brilho */
+    100% { transform: scale(0, 0); filter: brightness(0); opacity: 0; } /* Some completamente */
+}
+
+/* ================= Nova Tela de Prestígio (O Tabuleiro) ================= */
+.tela-prestigio {
+    position: fixed;
+    top: 0; left: 0; width: 100vw; height: 100vh;
+    background: linear-gradient(180deg, #050011 0%, #000000 100%);
+    z-index: 5000; /* Fica acima de tudo no jogo */
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    color: white; text-align: center;
+}
+
+/* Animação para quando "Reabrir a Live" (Efeito TV ligando) */
+@keyframes crt-turnon {
+    0% { transform: scale(0, 0.01); filter: brightness(10); opacity: 0; }
+    50% { transform: scale(1, 0.01); filter: brightness(3); opacity: 1; }
+    100% { transform: scale(1, 1); filter: brightness(1); opacity: 1; }
+}
